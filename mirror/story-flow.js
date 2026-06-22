@@ -6,6 +6,11 @@
   var WHEEL_TRIGGER_DELTA = 4;
   var WHEEL_RESET_MS = 180;
   var TOUCH_TRIGGER_DELTA = 18;
+  var FINAL_STATE_INDEX = 4;
+  var FINAL_SCRUB_VIDEO = ASSET_ROOT + "chapter-4-forward.mp4";
+  var FINAL_SCRUB_EASE = 0.06;
+  var FINAL_SCRUB_SETTLE_EPSILON = 0.0015;
+  var FINAL_SCRUB_SEEK_EPSILON = 0.01;
   var LOCKED_KEYS = {
     ArrowDown: 1,
     PageDown: 1,
@@ -92,6 +97,14 @@
   var transitionLayer;
   var fixedVisualLayer;
   var fixedVisualImage;
+  var finalScrubVideo;
+  var finalScrubReadyPromise = null;
+  var finalScrubResolve = null;
+  var finalScrubVideoReady = false;
+  var finalScrubVideoFailed = false;
+  var finalScrubRatio = 0;
+  var finalScrubDisplayRatio = 0;
+  var finalScrubFrame = 0;
   var restVisualImage;
   var heroStaticLayer;
   var heroStaticImage;
@@ -119,7 +132,8 @@
     buildStorySections(hero);
     buildFixedVisualLayer();
     buildTransitionLayer();
-    targets = [hero].concat(restSections);
+    buildFinalFooterVideo(footer);
+    targets = [hero].concat(restSections).concat([footer]);
 
     setVisualForState(0);
     setupInput();
@@ -203,7 +217,7 @@
     shell.className = "nt-story-shell";
     shell.setAttribute("data-story-system", "chapters");
 
-    restSections = states.slice(1).map(function (_state, index) {
+    restSections = states.slice(1, FINAL_STATE_INDEX).map(function (_state, index) {
       var section = document.createElement("section");
       var content = document.createElement("div");
 
@@ -241,6 +255,34 @@
     document.body.appendChild(fixedVisualLayer);
   }
 
+  function buildFinalFooterVideo(footer) {
+    var existingVideo = footer.querySelector(".nt-story-footer-video");
+
+    if (existingVideo) {
+      finalScrubVideo = existingVideo;
+    } else {
+      finalScrubVideo = document.createElement("video");
+      finalScrubVideo.className = "nt-story-footer-video";
+      finalScrubVideo.muted = true;
+      finalScrubVideo.playsInline = true;
+      finalScrubVideo.preload = "auto";
+      finalScrubVideo.poster = getStateImage(FINAL_STATE_INDEX);
+      finalScrubVideo.setAttribute("muted", "");
+      finalScrubVideo.setAttribute("playsinline", "");
+      finalScrubVideo.setAttribute("preload", "auto");
+      finalScrubVideo.setAttribute("aria-hidden", "true");
+      finalScrubVideo.src = FINAL_SCRUB_VIDEO;
+      footer.insertBefore(finalScrubVideo, footer.firstChild);
+    }
+
+    finalScrubVideo.pause();
+    finalScrubVideo.addEventListener("loadedmetadata", markFinalScrubVideoReady);
+    finalScrubVideo.addEventListener("loadeddata", markFinalScrubVideoReady);
+    finalScrubVideo.addEventListener("canplay", markFinalScrubVideoReady);
+    finalScrubVideo.addEventListener("error", markFinalScrubVideoFailed);
+    finalScrubVideo.load();
+  }
+
   function setupInput() {
     window.addEventListener("wheel", handleWheel, { passive: false });
     window.addEventListener("touchstart", handleTouchStart, { passive: false });
@@ -248,6 +290,7 @@
     window.addEventListener("touchend", handleTouchEnd, { passive: false });
     window.addEventListener("touchcancel", handleTouchEnd, { passive: false });
     window.addEventListener("keydown", handleKeyDown, { passive: false });
+    window.addEventListener("mousemove", handleMouseMove, { passive: true });
   }
 
   function handleWheel(event) {
@@ -257,7 +300,21 @@
     }
 
     var rawDirection = getRawDirection(event.deltaY);
-    if (!rawDirection || !canMove(rawDirection)) {
+    if (!rawDirection) {
+      return;
+    }
+
+    if (rawDirection > 0 && isFinalStateActive()) {
+      stopInput(event);
+      scrollToState(FINAL_STATE_INDEX);
+      return;
+    }
+
+    if (!canMove(rawDirection)) {
+      if (isFinalForwardInput(rawDirection)) {
+        stopInput(event);
+        scrollToState(FINAL_STATE_INDEX);
+      }
       return;
     }
 
@@ -341,12 +398,36 @@
       return;
     }
 
-    if (!direction || !canMove(direction)) {
+    if (!direction) {
+      return;
+    }
+
+    if (direction > 0 && isFinalStateActive()) {
+      stopInput(event);
+      scrollToState(FINAL_STATE_INDEX);
+      return;
+    }
+
+    if (!canMove(direction)) {
+      if (isFinalForwardInput(direction)) {
+        stopInput(event);
+        scrollToState(FINAL_STATE_INDEX);
+      }
       return;
     }
 
     stopInput(event);
     beginTransition(currentState + direction);
+  }
+
+  function handleMouseMove(event) {
+    finalScrubRatio = clamp(event.clientX / Math.max(1, window.innerWidth), 0, 1);
+
+    if (!isFinalStateActive()) {
+      finalScrubDisplayRatio = finalScrubRatio;
+    }
+
+    scheduleFinalScrubUpdate();
   }
 
   function stopInput(event) {
@@ -373,7 +454,7 @@
   function canMove(direction) {
     syncCurrentStateFromViewport();
 
-    if (direction > 0 && currentState >= states.length - 1) {
+    if (direction > 0 && currentState >= FINAL_STATE_INDEX) {
       return false;
     }
 
@@ -382,6 +463,15 @@
     }
 
     return isTargetReadable(targets[currentState]);
+  }
+
+  function isFinalForwardInput(direction) {
+    syncCurrentStateFromViewport();
+    return direction > 0 && currentState >= FINAL_STATE_INDEX && isTargetReadable(targets[currentState]);
+  }
+
+  function isFinalStateActive() {
+    return currentState >= FINAL_STATE_INDEX || document.body.getAttribute("data-nt-story-state") === String(FINAL_STATE_INDEX);
   }
 
   function isTargetReadable(target) {
@@ -485,7 +575,8 @@
       toState: toState,
       direction: direction,
       video: direction > 0 ? edge.forwardVideo : edge.reverseVideo,
-      destinationImage: getStateImage(toState)
+      destinationImage: getStateImage(toState),
+      finalScrub: direction > 0 && toState === FINAL_STATE_INDEX
     };
   }
 
@@ -494,6 +585,15 @@
 
     if (reducedMotion) {
       return imageReady.then(function () {
+        return { video: null };
+      });
+    }
+
+    if (transition.finalScrub) {
+      return Promise.all([
+        ensureFinalScrubVideoReady(),
+        imageReady
+      ]).then(function () {
         return { video: null };
       });
     }
@@ -507,6 +607,11 @@
   }
 
   function playTransition(transition, video) {
+    if (transition.finalScrub) {
+      commitTransition(transition, null);
+      return;
+    }
+
     if (reducedMotion || !video) {
       commitTransition(transition, null);
       return;
@@ -624,13 +729,15 @@
 
   function setVisualForState(state) {
     document.body.setAttribute("data-nt-story-state", String(state));
+    document.body.classList.toggle("nt-story-footer-active", state === FINAL_STATE_INDEX);
     syncRestBackgrounds(state);
+    scheduleFinalScrubUpdate();
 
     if (!fixedVisualLayer || !fixedVisualImage) {
       return;
     }
 
-    if (state <= 0) {
+    if (state <= 0 || state === FINAL_STATE_INDEX) {
       fixedVisualLayer.classList.remove("is-visible");
       fixedVisualImage.removeAttribute("src");
       fixedVisualImage.removeAttribute("data-current-image");
@@ -716,6 +823,8 @@
       preloadVideo(edge.forwardVideo);
       preloadVideo(edge.reverseVideo);
     });
+
+    preloadVideo(FINAL_SCRUB_VIDEO);
   }
 
   function preloadVideo(src) {
@@ -847,6 +956,101 @@
     return imageReadyPromises[src];
   }
 
+  function ensureFinalScrubVideoReady() {
+    if (!finalScrubVideo || finalScrubVideoReady || finalScrubVideoFailed) {
+      return Promise.resolve(finalScrubVideo);
+    }
+
+    if (!finalScrubReadyPromise) {
+      finalScrubReadyPromise = new Promise(function (resolve) {
+        finalScrubResolve = resolve;
+      });
+    }
+
+    markFinalScrubVideoReady();
+    return finalScrubReadyPromise;
+  }
+
+  function markFinalScrubVideoReady() {
+    if (!finalScrubVideo || finalScrubVideoReady || finalScrubVideoFailed || !isVideoDurationReady(finalScrubVideo)) {
+      return;
+    }
+
+    finalScrubVideoReady = true;
+    finalScrubVideo.pause();
+    document.body.classList.add("nt-story-footer-scrub-ready");
+    scheduleFinalScrubUpdate();
+
+    if (finalScrubResolve) {
+      finalScrubResolve(finalScrubVideo);
+      finalScrubResolve = null;
+    }
+  }
+
+  function markFinalScrubVideoFailed() {
+    finalScrubVideoFailed = true;
+
+    if (finalScrubResolve) {
+      finalScrubResolve(null);
+      finalScrubResolve = null;
+    }
+  }
+
+  function scheduleFinalScrubUpdate() {
+    if (finalScrubFrame) {
+      return;
+    }
+
+    finalScrubFrame = window.requestAnimationFrame(function () {
+      finalScrubFrame = 0;
+      if (applyFinalScrubPosition()) {
+        scheduleFinalScrubUpdate();
+      }
+    });
+  }
+
+  function applyFinalScrubPosition() {
+    if (currentState !== FINAL_STATE_INDEX || !finalScrubVideo || !isVideoDurationReady(finalScrubVideo)) {
+      return false;
+    }
+
+    var duration = finalScrubVideo.duration;
+    var endTime = Math.max(0, duration - 0.02);
+    var ratioDelta = finalScrubRatio - finalScrubDisplayRatio;
+
+    if (Math.abs(ratioDelta) <= FINAL_SCRUB_SETTLE_EPSILON) {
+      finalScrubDisplayRatio = finalScrubRatio;
+    } else {
+      finalScrubDisplayRatio += ratioDelta * FINAL_SCRUB_EASE;
+    }
+
+    var targetTime = clamp(finalScrubDisplayRatio, 0, 1) * endTime;
+
+    if (!finalScrubVideo.paused) {
+      finalScrubVideo.pause();
+    }
+
+    if (Math.abs(finalScrubVideo.currentTime - targetTime) < FINAL_SCRUB_SEEK_EPSILON) {
+      return Math.abs(finalScrubRatio - finalScrubDisplayRatio) > FINAL_SCRUB_SETTLE_EPSILON;
+    }
+
+    try {
+      finalScrubVideo.currentTime = targetTime;
+    } catch (error) {
+      window.console.warn("Footer scrub video could not seek to the requested frame.", error);
+    }
+
+    return Math.abs(finalScrubRatio - finalScrubDisplayRatio) > FINAL_SCRUB_SETTLE_EPSILON;
+  }
+
+  function isVideoDurationReady(video) {
+    return video && isFinite(video.duration) && video.duration > 0;
+  }
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
   function destroyVideo(video) {
     if (!video) {
       return;
@@ -906,7 +1110,13 @@
       return 0;
     }
 
-    return target.getBoundingClientRect().top + window.pageYOffset;
+    var targetTop = target.getBoundingClientRect().top + window.pageYOffset;
+
+    if (state === FINAL_STATE_INDEX) {
+      return targetTop + Math.max(0, target.offsetHeight - window.innerHeight);
+    }
+
+    return targetTop;
   }
 
   function forceScrollTo(y) {
