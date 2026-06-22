@@ -37,7 +37,7 @@
     {
       image: ASSET_ROOT + "story-point-2.png",
       text: {
-        title: ["Architectural", "Storytelling"],
+        title: ["Story", "Led", "Spaces"],
         subtitle: "Interior Design, Composed."
       }
     },
@@ -85,6 +85,7 @@
   ];
 
   var currentState = 0;
+  var heroSection = null;
   var inputLocked = false;
   var activeTransition = null;
   var touchStartY = 0;
@@ -122,11 +123,14 @@
       return;
     }
 
+    heroSection = hero;
     document.body.classList.add("nt-story-active");
     document.body.setAttribute("data-nt-story-state", "0");
+    syncHeroCopyAnchor();
+    window.addEventListener("resize", syncHeroCopyAnchor, { passive: true });
     window.setTimeout(function () {
       document.body.classList.add("nt-loader-finished");
-    }, 1900);
+    }, 900);
 
     buildStaticHero(hero);
     buildStorySections(hero);
@@ -592,9 +596,10 @@
     if (transition.finalScrub) {
       return Promise.all([
         ensureFinalScrubVideoReady(),
+        prepareVideo(transition.video),
         imageReady
-      ]).then(function () {
-        return { video: null };
+      ]).then(function (results) {
+        return { video: results[1] };
       });
     }
 
@@ -607,18 +612,16 @@
   }
 
   function playTransition(transition, video) {
-    if (transition.finalScrub) {
-      commitTransition(transition, null);
-      return;
-    }
-
     if (reducedMotion || !video) {
       commitTransition(transition, null);
       return;
     }
 
+    var duration = getTransitionDuration(video);
+
     video.defaultPlaybackRate = VIDEO_PLAYBACK_RATE;
     video.playbackRate = VIDEO_PLAYBACK_RATE;
+    video.classList.add("nt-story-transition-video");
     video.setAttribute("data-active-transition", "true");
     video.onended = function () {
       commitTransition(transition, video);
@@ -627,7 +630,16 @@
       commitTransition(transition, video);
     };
 
-    transitionLayer.replaceChildren(video);
+    transitionLayer.style.setProperty("--nt-transition-duration", duration + "ms");
+    transitionLayer.toggleAttribute("data-final-scrub", transition.finalScrub);
+    applyHeroThreadAnchor(transition);
+
+    if (transition.finalScrub) {
+      transitionLayer.replaceChildren(createTransitionUnderlay(transition), video);
+    } else {
+      transitionLayer.replaceChildren(video);
+    }
+
     mountTransitionText(transition, video);
     transitionLayer.classList.add("is-visible");
     document.body.classList.add("nt-story-video-active");
@@ -640,14 +652,114 @@
     }
   }
 
+  function getTransitionDuration(video) {
+    if (video && isFinite(video.duration) && video.duration > 0) {
+      return Math.max(900, Math.round((video.duration / VIDEO_PLAYBACK_RATE) * 1000));
+    }
+
+    return 1400;
+  }
+
+  function createTransitionUnderlay(transition) {
+    var image = document.createElement("img");
+
+    image.className = "nt-story-transition-underlay";
+    image.alt = "";
+    image.draggable = false;
+    image.decoding = "async";
+    image.src = getStateImage(transition.fromState);
+
+    return image;
+  }
+
+  function applyHeroThreadAnchor(transition) {
+    var anchor;
+    var titleStyles;
+
+    clearHeroThreadAnchor();
+
+    if (!heroSection || transition.fromState !== 0) {
+      return;
+    }
+
+    anchor = syncHeroCopyAnchor();
+    if (!anchor) {
+      return;
+    }
+
+    titleStyles = window.getComputedStyle(anchor.titleSample);
+    transitionLayer.setAttribute("data-from-hero", "true");
+    transitionLayer.style.setProperty("--nt-hero-copy-left", anchor.left + "px");
+    transitionLayer.style.setProperty("--nt-hero-copy-top", anchor.top + "px");
+    transitionLayer.style.setProperty("--nt-hero-copy-width", anchor.width + "px");
+    transitionLayer.style.setProperty("--nt-hero-title-font-family", titleStyles.fontFamily);
+    transitionLayer.style.setProperty("--nt-hero-title-font-size", titleStyles.fontSize);
+    transitionLayer.style.setProperty("--nt-hero-title-font-weight", titleStyles.fontWeight);
+    transitionLayer.style.setProperty("--nt-hero-title-line-height", titleStyles.lineHeight);
+  }
+
+  function syncHeroCopyAnchor() {
+    var titleWrapper;
+    var titleSample;
+    var rect;
+    var wrapperStyles;
+    var paddingLeft;
+    var left;
+    var top;
+    var width;
+
+    if (!heroSection) {
+      return null;
+    }
+
+    titleWrapper = heroSection.querySelector(".title-wrapper.is-hero");
+    titleSample = heroSection.querySelector(".title-wrapper.is-hero .hero-title");
+
+    if (!titleWrapper || !titleSample) {
+      return null;
+    }
+
+    rect = titleWrapper.getBoundingClientRect();
+
+    if (!rect.width || !rect.height) {
+      return null;
+    }
+
+    wrapperStyles = window.getComputedStyle(titleWrapper);
+    paddingLeft = parseFloat(wrapperStyles.paddingLeft) || 0;
+    left = Math.max(0, rect.left + paddingLeft);
+    top = Math.max(0, rect.top);
+    width = Math.min(window.innerWidth - left, Math.max(0, rect.width - paddingLeft));
+    document.body.style.setProperty("--nt-story-copy-left", left + "px");
+    document.body.style.setProperty("--nt-story-copy-top", top + "px");
+
+    return {
+      left: left,
+      top: top,
+      width: width,
+      titleSample: titleSample
+    };
+  }
+
+  function clearHeroThreadAnchor() {
+    if (!transitionLayer) {
+      return;
+    }
+
+    transitionLayer.removeAttribute("data-from-hero");
+    transitionLayer.style.removeProperty("--nt-hero-copy-left");
+    transitionLayer.style.removeProperty("--nt-hero-copy-top");
+    transitionLayer.style.removeProperty("--nt-hero-copy-width");
+    transitionLayer.style.removeProperty("--nt-hero-title-font-family");
+    transitionLayer.style.removeProperty("--nt-hero-title-font-size");
+    transitionLayer.style.removeProperty("--nt-hero-title-font-weight");
+    transitionLayer.style.removeProperty("--nt-hero-title-line-height");
+  }
+
   function mountTransitionText(transition, video) {
     var overlay = document.createElement("div");
     var thread = document.createElement("div");
-    var duration = 1400;
-
-    if (video && isFinite(video.duration) && video.duration > 0) {
-      duration = Math.max(900, Math.round((video.duration / VIDEO_PLAYBACK_RATE) * 1000));
-    }
+    var duration = getTransitionDuration(video);
 
     overlay.className = "nt-story-copy-rail";
     overlay.setAttribute("aria-hidden", "true");
@@ -659,9 +771,15 @@
 
     states.forEach(function (_state, index) {
       var item = document.createElement("div");
+      var isEntering = index === transition.toState;
+
       item.className = "nt-story-copy-thread-item";
       item.setAttribute("data-story-thread-state", String(index));
-      item.appendChild(createStateText(index, "nt-story-thread-copy"));
+      item.setAttribute("data-story-thread-role", isEntering ? "entering" : "rail");
+      item.appendChild(createStateText(index, "nt-story-thread-copy", {
+        entering: isEntering,
+        enterDelay: 0
+      }));
       thread.appendChild(item);
     });
 
@@ -669,24 +787,35 @@
     transitionLayer.appendChild(overlay);
   }
 
-  function createStateText(stateIndex, className) {
+  function createStateText(stateIndex, className, options) {
     var state = states[stateIndex] || states[0];
     var text = state.text || states[0].text;
+    var settings = options || {};
     var wrap = document.createElement("div");
     var title = document.createElement("div");
     var subtitle = document.createElement("p");
 
     wrap.className = "nt-story-copy " + className;
+    if (settings.entering) {
+      wrap.className += " is-entering";
+    }
     title.className = "nt-story-copy-title";
 
     text.title.forEach(function (line) {
       var lineNode = document.createElement("span");
-      lineNode.textContent = line;
+      var lineText = document.createElement("span");
+
+      lineNode.className = "nt-story-copy-line hero-title-contain" + (title.children.length ? " is-2" : "");
+      lineText.className = "nt-story-copy-line-text hero-title";
+      lineText.textContent = line;
+      lineText.style.setProperty("--nt-line-delay", (settings.enterDelay + title.children.length * 70) + "ms");
+      lineNode.appendChild(lineText);
       title.appendChild(lineNode);
     });
 
     subtitle.className = "nt-story-copy-subtitle";
     subtitle.textContent = text.subtitle || "";
+    subtitle.style.setProperty("--nt-subtitle-delay", (settings.enterDelay + 130 + text.title.length * 70) + "ms");
 
     wrap.appendChild(title);
     if (text.subtitle) {
@@ -703,6 +832,7 @@
     }
 
     currentState = transition.toState;
+    primeFinalScrubFromTransition(transition);
     setVisualForState(transition.toState);
     scrollToState(transition.toState);
     preloadAround(transition.toState);
@@ -713,6 +843,10 @@
       destroyVideo(video);
       transitionLayer.replaceChildren();
       transitionLayer.removeAttribute("data-transition");
+      transitionLayer.removeAttribute("data-final-scrub");
+      transitionLayer.removeAttribute("data-from-hero");
+      transitionLayer.style.removeProperty("--nt-transition-duration");
+      clearHeroThreadAnchor();
       activeTransition = null;
       unlockStoryScroll();
     });
@@ -721,6 +855,10 @@
   function cancelTransition() {
     transitionLayer.classList.remove("is-visible");
     transitionLayer.replaceChildren();
+    transitionLayer.removeAttribute("data-final-scrub");
+    transitionLayer.removeAttribute("data-from-hero");
+    transitionLayer.style.removeProperty("--nt-transition-duration");
+    clearHeroThreadAnchor();
     document.body.classList.remove("nt-story-video-active");
     activeTransition = null;
     setVisualForState(currentState);
@@ -794,6 +932,22 @@
   function removeRestVisualImage() {
     if (restVisualImage && restVisualImage.parentElement) {
       restVisualImage.remove();
+    }
+  }
+
+  function primeFinalScrubFromTransition(transition) {
+    if (!transition.finalScrub || !finalScrubVideo || !isVideoDurationReady(finalScrubVideo)) {
+      return;
+    }
+
+    finalScrubRatio = 1;
+    finalScrubDisplayRatio = 1;
+    finalScrubVideo.pause();
+
+    try {
+      finalScrubVideo.currentTime = Math.max(0, finalScrubVideo.duration - 0.02);
+    } catch (error) {
+      window.console.warn("Footer scrub video could not be primed after transition.", error);
     }
   }
 
