@@ -4516,16 +4516,6 @@ blockquote {
   width: 100%;
 }
 
-.glass-light {
-  z-index: 1;
-  opacity: .4;
-  filter: blur(35px);
-  background-image: radial-gradient(circle, #fff, #fff0 80%);
-  width: 8em;
-  height: 8em;
-  position: absolute;
-}
-
 .footer-buttons {
   grid-column-gap: 10px;
   grid-row-gap: 10px;
