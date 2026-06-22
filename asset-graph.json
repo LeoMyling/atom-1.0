@@ -1,0 +1,1034 @@
+{
+  "page": "https://www.thefoundation.house/",
+  "captured_at": "2026-06-22T12:07:24Z",
+  "summary": {
+    "total_responses": 100,
+    "same_origin": 2,
+    "external": 98,
+    "loaded_only_after_scroll": 55,
+    "by_resource_type": {
+      "document": 1,
+      "other": 1,
+      "script": 13,
+      "image": 69,
+      "font": 3,
+      "xhr": 4,
+      "media": 7,
+      "stylesheet": 1,
+      "fetch": 1
+    },
+    "providers_detected": [
+      "Vimeo"
+    ]
+  },
+  "same_site_routes_from_anchors": [
+    "/",
+    "/apply",
+    "/battalion-tpo",
+    "/careers",
+    "/contact",
+    "/programs"
+  ],
+  "requests": [
+    {
+      "url": "https://www.thefoundation.house/",
+      "resource_type": "document",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "content_length": null,
+      "same_origin": true,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://www.thefoundation.house/contact",
+      "resource_type": "other",
+      "status": 200,
+      "content_type": "text/html; charset=utf-8",
+      "content_length": null,
+      "same_origin": true,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.jsdelivr.net/gh/kujira22/kujira_webgl@main/Battalion/13/app.js",
+      "resource_type": "script",
+      "status": 200,
+      "content_type": "application/javascript; charset=utf-8",
+      "content_length": "380883",
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.jsdelivr.net/gh/studio-freight/lenis@v0.2.26/bundled/lenis.js",
+      "resource_type": "script",
+      "status": 200,
+      "content_type": "application/javascript; charset=utf-8",
+      "content_length": "4176",
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.jsdelivr.net/npm/@finsweet/attributes-numbercount@1/numbercount.js",
+      "resource_type": "script",
+      "status": 200,
+      "content_type": "application/javascript; charset=utf-8",
+      "content_length": "2484",
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8eca2_diag-arrow-grey.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8eca7_diag-arrow-white.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8eca8_louisiana.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8eca9_michigan.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecaa_minnesota.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecab_newmexico.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecac_indiana.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecad_northdakota.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecae_newjersey.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecaf_maine.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecb0_newhampshire.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecb6_iowa.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecb7_nebraska.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecb8_kansas.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecb9_montana.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecba_massachussets.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecbb_oregon.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecbc_mississppi.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecbd_idaho.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecbe_newyork.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecbf_missouri.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecc0_oklahoma.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecc1_nevada.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecc2_illinois.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecc3_maryland.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecc4_ohio.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecc5_northcarolina.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecd6_hawaii.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecd7_tennessee.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecd8_georgia.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecd9_kentucky.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecda_puertorico.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecdb_wisconsin.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecdc_delaware.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecdd_utah.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecde_california.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecdf_rhodeisland.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ece0_alabama.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ece1_arkansas.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ece2_southcarolina.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ece3_westvirginia.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ece4_arizona.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ece5_connecticut.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ece6_southdakota.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecf2_colorado.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecf4_washington.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecf5_texas.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecf6_vermont.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecf7_wyoming.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecf8_rental-3-p-1600.jpg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/jpg",
+      "content_length": "115546",
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecfa_battalion-rental01-p-1600.jpg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/jpg",
+      "content_length": "125881",
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecfc_rental-apartment-p-1600.jpg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/jpg",
+      "content_length": "124186",
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ecfe_virginia.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ed00_florida.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ed01_alaska.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ed02_pennsylvania.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ed0d_font.woff2",
+      "resource_type": "font",
+      "status": 200,
+      "content_type": "application/octet-stream",
+      "content_length": "53468",
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ed0f_font.woff2",
+      "resource_type": "font",
+      "status": 200,
+      "content_type": "application/octet-stream",
+      "content_length": "57892",
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ed11_font.woff2",
+      "resource_type": "font",
+      "status": 200,
+      "content_type": "application/octet-stream",
+      "content_length": "58128",
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ed13_mobile-map.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ed25_Battalion_Loop_03_02.json",
+      "resource_type": "xhr",
+      "status": 200,
+      "content_type": "application/json",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ed2f_Battalion_Logo_Animation_Full_Webm-transcode.mp4",
+      "resource_type": "media",
+      "status": 206,
+      "content_type": "video/mp4",
+      "content_length": "72175",
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ed5a_battalion-grass-plots.png",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/png",
+      "content_length": "239985",
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ed60_iphone-outline.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ed65_Top_Section_01.json",
+      "resource_type": "xhr",
+      "status": 200,
+      "content_type": "application/json",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ed66_Bottom_Section_01.json",
+      "resource_type": "xhr",
+      "status": 200,
+      "content_type": "application/json",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ed75_battalion-homerender-desktop-p-1600.jpg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/jpg",
+      "content_length": "112312",
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ed78_battalion-doorway-process.jpg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/jpeg",
+      "content_length": "246355",
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ed81_Middle_Section_04.json",
+      "resource_type": "xhr",
+      "status": 200,
+      "content_type": "application/json",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ed96_btn-home-shape-bg.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ed99_9b014d24_battalion-render-footer-16.png",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/png",
+      "content_length": "555049",
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8ed9c_battalion-about-21.png",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/png",
+      "content_length": "748971",
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/66f603e5069e2b5cc1f8eda2_btn-hero-home-mobile-visual.jpg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/jpeg",
+      "content_length": "300323",
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/67d4e48bfc1f3ddeeede7030_foundation-logo.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:scroll"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/67d4e89af82022e8cd70a1e3_foundation-logotype.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/67d51db3e9d19b9becc6a5a1_foundation-logo-colour.svg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/svg+xml",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/67d5443695de9f5015d096e8_foundation-iphone-tools2.jpg",
+      "resource_type": "image",
+      "status": 200,
+      "content_type": "image/jpeg",
+      "content_length": "814345",
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/css/battalion-somefolk.webflow.0dfdeb3af.css",
+      "resource_type": "stylesheet",
+      "status": 200,
+      "content_type": "text/css",
+      "content_length": "22053",
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/js/webflow.13fbd709.a941f1088eb0f181.js",
+      "resource_type": "script",
+      "status": 200,
+      "content_type": "text/javascript",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/js/webflow.schunk.a2b3c6f017aef1ab.js",
+      "resource_type": "script",
+      "status": 200,
+      "content_type": "text/javascript",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/js/webflow.schunk.b7cad701f94860c2.js",
+      "resource_type": "script",
+      "status": 200,
+      "content_type": "text/javascript",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdn.prod.website-files.com/66f603e5069e2b5cc1f8ec86/js/webflow.schunk.e858353eb173962f.js",
+      "resource_type": "script",
+      "status": 200,
+      "content_type": "text/javascript",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/ScrollTrigger.min.js",
+      "resource_type": "script",
+      "status": 200,
+      "content_type": "application/javascript; charset=utf-8",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.10.4/gsap.min.js",
+      "resource_type": "script",
+      "status": 200,
+      "content_type": "application/javascript; charset=utf-8",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.3/ScrollTrigger.min.js",
+      "resource_type": "script",
+      "status": 200,
+      "content_type": "application/javascript; charset=utf-8",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.3/gsap.min.js",
+      "resource_type": "script",
+      "status": 200,
+      "content_type": "application/javascript; charset=utf-8",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://d3e54v103j8qbb.cloudfront.net/js/jquery-3.5.1.min.dc5e7f18c8.js?site=66f603e5069e2b5cc1f8ec86",
+      "resource_type": "script",
+      "status": 200,
+      "content_type": "application/javascript",
+      "content_length": null,
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://download-video-ak.vimeocdn.com/v3-1/playback/0f464e2f-437c-4a3b-9cbe-b477a1d615d4/93e5a7b1?__token__=st=1782130018~exp=1782133618~acl=%2Fv3-1%2Fplayback%2F0f464e2f-437c-4a3b-9cbe-b477a1d615d4%2F93e5a7b1%2A~hmac=68ac4f1eae196741ae17a96c9885a6e58443042946e1378de106c604aac4d8ec&r=dXMtZWFzdDE%3D",
+      "resource_type": "media",
+      "status": 206,
+      "content_type": "video/mp4",
+      "content_length": "28515222",
+      "same_origin": false,
+      "provider": "Vimeo",
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://download-video-ak.vimeocdn.com/v3-1/playback/6d9bc575-b2bf-4234-a02e-bf73c2bcd250/7e362c5c-9f30800d?__token__=st=1782130018~exp=1782133618~acl=%2Fv3-1%2Fplayback%2F6d9bc575-b2bf-4234-a02e-bf73c2bcd250%2F7e362c5c-9f30800d%2A~hmac=b2a7ee0409b546186cd7f2529ac8c15eb43bdd104c521ba8f2b2eb3dbb6d38f9&r=dXMtY2VudHJhbDE%3D",
+      "resource_type": "media",
+      "status": 206,
+      "content_type": "video/mp4",
+      "content_length": "27792015",
+      "same_origin": false,
+      "provider": "Vimeo",
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://download-video-ak.vimeocdn.com/v3-1/playback/908a808a-cb6d-4d9d-b1ee-bf4deb494475/d172ff13?__token__=st=1782130018~exp=1782133618~acl=%2Fv3-1%2Fplayback%2F908a808a-cb6d-4d9d-b1ee-bf4deb494475%2Fd172ff13%2A~hmac=9248a2ff616fdf6622e60251a83a2b7913a779a2768348c7455d2ac044dd3231&r=dXMtd2VzdDE%3D",
+      "resource_type": "media",
+      "status": 206,
+      "content_type": "video/mp4",
+      "content_length": "7218480",
+      "same_origin": false,
+      "provider": "Vimeo",
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://player.vimeo.com/api/player.js",
+      "resource_type": "script",
+      "status": 200,
+      "content_type": "application/javascript;charset=utf-8",
+      "content_length": "7932",
+      "same_origin": false,
+      "provider": "Vimeo",
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://player.vimeo.com/progressive_redirect/playback/957121957/rendition/2160p/file.mp4?loc=external&signature=8c27c5d0a183d800155cfbafef90823d90531c0113db2046cf789347801e9955",
+      "resource_type": "media",
+      "status": 302,
+      "content_type": "",
+      "content_length": "0",
+      "same_origin": false,
+      "provider": "Vimeo",
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://player.vimeo.com/progressive_redirect/playback/957124400/rendition/2160p/file.mp4?loc=external&signature=abe2c4cddf092b35e0860539c00a2809cd53da4d8dcaeb6ab34ac8c1389f9166",
+      "resource_type": "media",
+      "status": 302,
+      "content_type": "",
+      "content_length": "0",
+      "same_origin": false,
+      "provider": "Vimeo",
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://player.vimeo.com/progressive_redirect/playback/976122369/rendition/1080p/file.mp4?loc=external&signature=4a6d4c105a4703bda54251ecab75e104cfe70cd3eb7231949b75e68f494e46e9",
+      "resource_type": "media",
+      "status": 302,
+      "content_type": "",
+      "content_length": "0",
+      "same_origin": false,
+      "provider": "Vimeo",
+      "first_seen": "desktop:load"
+    },
+    {
+      "url": "https://raw.githubusercontent.com/kujira22/kujira_webgl/master/Battalion/Foundation2.glb",
+      "resource_type": "fetch",
+      "status": 200,
+      "content_type": "application/octet-stream",
+      "content_length": "6672",
+      "same_origin": false,
+      "provider": null,
+      "first_seen": "desktop:load"
+    }
+  ]
+}
