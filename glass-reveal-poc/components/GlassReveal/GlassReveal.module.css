@@ -1,0 +1,66 @@
+.shell {
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: clamp(12px, 4vw, 48px);
+  background: #111;
+}
+
+.frame {
+  --reveal-x: 50%;
+  --reveal-y: 50%;
+  --reveal-radius: 220px;
+  position: relative;
+  width: min(100%, 1376px);
+  aspect-ratio: 1376 / 768;
+  overflow: hidden;
+  background: #111;
+}
+
+.backImage,
+.frontImage {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  pointer-events: none;
+}
+
+.backImage {
+  z-index: 1;
+}
+
+.frontImage {
+  z-index: 2;
+}
+
+.frame[data-active="true"] .frontImage {
+  -webkit-mask-image: radial-gradient(
+    circle var(--reveal-radius) at var(--reveal-x) var(--reveal-y),
+    transparent 0%,
+    transparent 42%,
+    rgba(0, 0, 0, 0.45) 68%,
+    #000 100%
+  );
+  mask-image: radial-gradient(
+    circle var(--reveal-radius) at var(--reveal-x) var(--reveal-y),
+    transparent 0%,
+    transparent 42%,
+    rgba(0, 0, 0, 0.45) 68%,
+    #000 100%
+  );
+}
+
+@media (max-width: 900px) {
+  .frame {
+    --reveal-radius: 180px;
+  }
+}
+
+@media (max-width: 620px) {
+  .frame {
+    --reveal-radius: 140px;
+  }
+}

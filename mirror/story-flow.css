@@ -1,0 +1,327 @@
+html.nt-story-lock,
+html.nt-story-lock body {
+  overflow: hidden;
+  overscroll-behavior: none;
+  scroll-behavior: auto !important;
+  touch-action: none;
+}
+
+body.nt-story-active .intro-section,
+body.nt-story-active .offerings-section,
+body.nt-story-active .offer-wrap,
+body.nt-story-active .offerings-collection,
+body.nt-story-active .states-section,
+body.nt-story-active .hero-section.is-product,
+body.nt-story-active .approach-section.is-main,
+body.nt-story-active .split-section,
+body.nt-story-active .hero-section.is-home.power {
+  display: none !important;
+}
+
+body.nt-story-active .hero-section.is-home:not(.power) {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+body.nt-story-active .hero-section.is-home:not(.power) > :not(.nt-story-hero-media) {
+  position: relative;
+  z-index: 2;
+}
+
+body.nt-story-active .hero-section.is-home:not(.power) > .column.middle,
+body.nt-story-active .hero-section.is-home:not(.power) > img.image-full,
+body.nt-story-active .hero-section.is-home:not(.power) canvas {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.nt-story-hero-media {
+  --nt-reveal-x: 50%;
+  --nt-reveal-y: 50%;
+  --nt-reveal-radius: min(19vw, 300px);
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  background: #111;
+  pointer-events: auto;
+  transform: translateZ(0);
+}
+
+.nt-story-hero-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at var(--nt-reveal-x) var(--nt-reveal-y), rgba(255, 255, 255, 0.08), transparent 24vw),
+    linear-gradient(180deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.2));
+  opacity: 0;
+  transition: opacity 260ms ease;
+}
+
+.nt-story-hero-media.is-revealing::after {
+  opacity: 1;
+}
+
+.nt-story-hero-image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  pointer-events: none;
+  transform: translateZ(0) scale(1.012);
+  will-change: transform, opacity, -webkit-mask-image, mask-image;
+}
+
+.nt-story-hero-interior {
+  z-index: 1;
+}
+
+.nt-story-hero-exterior {
+  z-index: 2;
+}
+
+.nt-story-glass-edge {
+  position: absolute;
+  left: var(--nt-reveal-x);
+  top: var(--nt-reveal-y);
+  z-index: 3;
+  width: calc(var(--nt-reveal-radius) * 2.12);
+  height: calc(var(--nt-reveal-radius) * 2.12);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate3d(-50%, -50%, 0);
+  transition: opacity 220ms ease;
+  will-change: transform, opacity;
+  filter: drop-shadow(0 0 18px rgba(255, 255, 255, 0.2));
+}
+
+.nt-story-hero-media.is-revealing .nt-story-glass-edge {
+  opacity: 1;
+}
+
+.nt-story-glass-edge::before,
+.nt-story-glass-edge::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+}
+
+.nt-story-glass-edge::before {
+  background:
+    radial-gradient(circle, transparent 52%, rgba(255, 255, 255, 0.5) 56%, rgba(255, 255, 255, 0.12) 62%, transparent 70%),
+    conic-gradient(from 18deg, transparent 0deg 21deg, rgba(255, 255, 255, 0.42) 22deg 23deg, transparent 24deg 68deg, rgba(255, 255, 255, 0.28) 69deg 70deg, transparent 71deg 142deg, rgba(255, 255, 255, 0.35) 143deg 144deg, transparent 145deg 360deg);
+  filter: blur(1.8px);
+  mix-blend-mode: screen;
+}
+
+.nt-story-glass-edge::after {
+  background:
+    linear-gradient(32deg, transparent 0 48%, rgba(255, 255, 255, 0.36) 49%, transparent 50%),
+    linear-gradient(126deg, transparent 0 56%, rgba(255, 255, 255, 0.22) 57%, transparent 58%),
+    linear-gradient(78deg, transparent 0 46%, rgba(255, 255, 255, 0.24) 47%, transparent 48%);
+  clip-path: circle(44% at 50% 50%);
+  opacity: 0.52;
+  filter: blur(0.35px);
+}
+
+.nt-story-shell {
+  position: relative;
+  z-index: 101;
+  background: transparent;
+}
+
+.nt-story-fixed-visual {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  background: #111;
+  transition: none;
+  transform: translateZ(0);
+  contain: paint;
+  will-change: opacity;
+}
+
+.nt-story-fixed-visual.is-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.nt-story-fixed-visual img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  display: block;
+  transform: translateZ(0);
+}
+
+.nt-story-rest {
+  position: relative;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow: hidden;
+  background: transparent;
+  isolation: isolate;
+}
+
+.nt-story-rest[data-story-state="4"] {
+  background-image: none;
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.nt-story-rest[data-story-state="4"] .nt-story-rest-image {
+  object-position: center;
+}
+
+.nt-story-rest-image {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  user-select: none;
+  pointer-events: none;
+  transform: translateZ(0);
+  will-change: transform, opacity;
+}
+
+body.nt-story-active .nt-story-rest-image {
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+.nt-story-rest::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.12), rgba(0, 0, 0, 0.2));
+}
+
+.nt-story-content {
+  position: relative;
+  z-index: 3;
+  min-height: inherit;
+  pointer-events: none;
+}
+
+.nt-story-transition {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  background-color: #111;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  transition: none;
+  transform: translateZ(0);
+  contain: paint;
+  will-change: opacity;
+}
+
+.nt-story-transition.is-visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.nt-story-transition video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: translateZ(0);
+}
+
+body.nt-story-active .footer-section {
+  position: relative;
+  z-index: 101;
+  overflow: hidden;
+  isolation: isolate;
+  background-color: transparent !important;
+}
+
+body.nt-story-active .footer-section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background-image: url("./story-assets/puppy-finale-focused.jpg");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  transform: translateZ(0);
+}
+
+body.nt-story-active .footer-section > * {
+  position: relative;
+  z-index: 1;
+}
+
+body.nt-story-active .footer-section .render-container.is-footer,
+body.nt-story-active .footer-section .render-container.is-mobile.footer {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+@media (hover: hover) and (pointer: fine) and (min-width: 769px) {
+  .nt-story-hero-media.is-revealing .nt-story-hero-exterior {
+    -webkit-mask-image: radial-gradient(
+      circle var(--nt-reveal-radius) at var(--nt-reveal-x) var(--nt-reveal-y),
+      transparent 0%,
+      transparent 45%,
+      rgba(0, 0, 0, 0.28) 62%,
+      #000 76%,
+      #000 100%
+    );
+    mask-image: radial-gradient(
+      circle var(--nt-reveal-radius) at var(--nt-reveal-x) var(--nt-reveal-y),
+      transparent 0%,
+      transparent 45%,
+      rgba(0, 0, 0, 0.28) 62%,
+      #000 76%,
+      #000 100%
+    );
+  }
+}
+
+@media (max-width: 768px), (hover: none), (pointer: coarse) {
+  .nt-story-hero-interior,
+  .nt-story-glass-edge {
+    display: none;
+  }
+
+  .nt-story-hero-media::after {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nt-story-transition {
+    display: none;
+  }
+
+  .nt-story-hero-image,
+  .nt-story-rest-image {
+    transform: none;
+  }
+}
