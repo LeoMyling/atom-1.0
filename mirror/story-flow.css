@@ -1,3 +1,22 @@
+/* Suppress the visible scrollbar globally so it never reserves (and then
+   releases) gutter width. The story locks/unlocks `overflow: hidden` on every
+   transition; a layout-affecting scrollbar would pop in/out and shift content
+   horizontally on each handoff. Hiding it keeps the content box width constant.
+   Scrolling, wheel/keyboard/touch story input, and programmatic scroll are
+   unaffected — only the bar's rendering is removed. */
+html,
+body {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
 html.nt-story-lock,
 html.nt-story-lock body {
   overflow: hidden;
@@ -333,9 +352,19 @@ body.nt-story-video-active .nt-story-fixed-visual {
   justify-content: flex-start;
   box-sizing: border-box;
   overflow: hidden;
-  padding: var(--nt-story-copy-top, clamp(150px, 32vh, 220px)) 0 0 var(--nt-story-copy-left, 0px);
+  padding: var(--nt-story-copy-top, clamp(150px, 32vh, 220px)) 0 0 calc(var(--nt-story-copy-left, 0px) + var(--nt-story-copy-left-offset, 0px));
   color: #fff;
   pointer-events: none;
+}
+
+/* Desktop-only breathing room for the story hero copy block (headline + subtitle).
+   Additive offset layered on top of the JS-measured --nt-story-copy-left anchor;
+   does not alter the global container padding or the right-aligned state-3 copy. */
+@media (min-width: 992px) {
+  .nt-story-content,
+  .nt-story-copy-thread-item {
+    --nt-story-copy-left-offset: 32px;
+  }
 }
 
 .nt-story-rest[data-story-state="3"] .nt-story-content {
@@ -355,7 +384,7 @@ body.nt-story-video-active .nt-story-fixed-visual {
 
 .nt-story-copy {
   width: min(96vw, 1120px);
-  max-width: calc(100vw - var(--nt-story-copy-left, 0px) - 1rem);
+  max-width: calc(100vw - var(--nt-story-copy-left, 0px) - var(--nt-story-copy-left-offset, 0px) - 1rem);
   overflow: hidden;
   color: #fff;
   text-shadow: none;
@@ -439,6 +468,19 @@ body.nt-story-video-active .nt-story-fixed-visual {
   visibility: visible;
 }
 
+/* Hold-final-frame handoff: when a transition video ends it stays mounted and
+   paused on its last frame while the destination still is revealed beneath it.
+   .is-handoff arms the opacity transition (kept off the default layer so the
+   layer still appears instantly at the start of a transition); .is-handoff-fading
+   then dissolves the final frame to opacity 0 over --nt-transition-fade. */
+.nt-story-transition.is-handoff {
+  transition: opacity var(--nt-transition-fade, 200ms) ease;
+}
+
+.nt-story-transition.is-handoff.is-handoff-fading {
+  opacity: 0;
+}
+
 .nt-story-transition video {
   position: absolute;
   inset: 0;
@@ -501,7 +543,7 @@ body.nt-story-video-active .nt-story-fixed-visual {
   display: flex;
   align-items: flex-start;
   justify-content: flex-start;
-  padding: var(--nt-story-copy-top, clamp(150px, 32vh, 220px)) 0 0 var(--nt-story-copy-left, 0px);
+  padding: var(--nt-story-copy-top, clamp(150px, 32vh, 220px)) 0 0 calc(var(--nt-story-copy-left, 0px) + var(--nt-story-copy-left-offset, 0px));
   box-sizing: border-box;
   overflow: hidden;
 }

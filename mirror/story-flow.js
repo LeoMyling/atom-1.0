@@ -3,6 +3,8 @@
   var HERO_IMAGE = ASSET_ROOT + "hero-static.jpeg?v=frame-parity-20260623-1";
   var HERO_WATER_IMAGE = ASSET_ROOT + "hero-water.png";
   var VIDEO_PLAYBACK_RATE = 1.9;
+  var HANDOFF_FADE_MS = 200;
+  var HANDOFF_DECODE_TIMEOUT_MS = 120;
   var WHEEL_TRIGGER_DELTA = 4;
   var WHEEL_RESET_MS = 180;
   var TOUCH_TRIGGER_DELTA = 18;
@@ -1327,19 +1329,112 @@
     scrollToState(transition.toState);
     preloadAround(transition.toState);
 
-    window.requestAnimationFrame(function () {
-      transitionLayer.classList.remove("is-visible");
-      document.body.classList.remove("nt-story-video-active");
-      destroyVideo(video);
-      transitionLayer.replaceChildren();
-      transitionLayer.removeAttribute("data-transition");
-      transitionLayer.removeAttribute("data-final-scrub");
-      transitionLayer.removeAttribute("data-from-hero");
-      transitionLayer.style.removeProperty("--nt-transition-duration");
-      clearHeroThreadAnchor();
-      activeTransition = null;
-      unlockStoryScroll();
+    // Reduced motion / no video: keep the original instant teardown so the
+    // reduced-motion experience is unchanged (no fade, no extra frames).
+    if (reducedMotion || !video) {
+      window.requestAnimationFrame(function () {
+        finishTransition(transition, video);
+      });
+      return;
+    }
+
+    // Hold-final-frame handoff: the video has reached its final frame. Keep it
+    // mounted and visible (paused on that frame) covering the destination, then
+    // reveal the destination still beneath it with a short cross-fade instead
+    // of a hard cut. Un-hiding the fixed visual now (dropping nt-story-video-active)
+    // places the decoded still directly under the still-opaque video layer so
+    // the fade simply dissolves the video frame into the matching still.
+    video.pause();
+    document.body.classList.remove("nt-story-video-active");
+
+    whenDestinationStillReady(function () {
+      if (activeTransition !== transition) {
+        finishTransition(transition, video);
+        return;
+      }
+      fadeOutTransitionLayer(function () {
+        finishTransition(transition, video);
+      });
     });
+  }
+
+  // Shared teardown for a committed transition: hide and clear the transition
+  // layer, release the video, reset transition attributes, and unlock input.
+  function finishTransition(transition, video) {
+    transitionLayer.classList.remove("is-visible");
+    transitionLayer.classList.remove("is-handoff");
+    transitionLayer.classList.remove("is-handoff-fading");
+    document.body.classList.remove("nt-story-video-active");
+    destroyVideo(video);
+    transitionLayer.replaceChildren();
+    transitionLayer.removeAttribute("data-transition");
+    transitionLayer.removeAttribute("data-final-scrub");
+    transitionLayer.removeAttribute("data-from-hero");
+    transitionLayer.style.removeProperty("--nt-transition-duration");
+    transitionLayer.style.removeProperty("--nt-transition-fade");
+    clearHeroThreadAnchor();
+    activeTransition = null;
+    unlockStoryScroll();
+  }
+
+  // Resolve once the destination still is decoded and painted, so the cross-fade
+  // reveals a ready image rather than a blank frame. Falls back on a short
+  // timeout (and on states with no fixed still) so the handoff never stalls.
+  function whenDestinationStillReady(callback) {
+    var settled = false;
+    function go() {
+      if (settled) {
+        return;
+      }
+      settled = true;
+      callback();
+    }
+
+    var image = fixedVisualImage;
+    var hasStill = image &&
+      image.getAttribute("src") &&
+      fixedVisualLayer &&
+      fixedVisualLayer.classList.contains("is-visible");
+
+    if (hasStill && typeof image.decode === "function") {
+      image.decode().then(go).catch(go);
+      window.setTimeout(go, HANDOFF_DECODE_TIMEOUT_MS);
+      return;
+    }
+
+    // No destination still to wait on (hero / final state): proceed promptly.
+    window.setTimeout(go, 0);
+  }
+
+  // Cross-fade the (paused, final-frame) transition layer out over ~200ms.
+  // Uses a two-step class toggle so the opacity transition is registered before
+  // opacity flips, and guards completion with both transitionend and a timeout.
+  function fadeOutTransitionLayer(callback) {
+    var done = false;
+    function finish() {
+      if (done) {
+        return;
+      }
+      done = true;
+      transitionLayer.removeEventListener("transitionend", onEnd);
+      callback();
+    }
+    function onEnd(event) {
+      if (event.target === transitionLayer && event.propertyName === "opacity") {
+        finish();
+      }
+    }
+
+    transitionLayer.style.setProperty("--nt-transition-fade", HANDOFF_FADE_MS + "ms");
+    transitionLayer.classList.add("is-handoff");
+    transitionLayer.addEventListener("transitionend", onEnd);
+    // Force a reflow so the armed transition and the opacity:1 baseline are
+    // committed before opacity flips to 0; this makes the fade fire reliably
+    // without depending on requestAnimationFrame (which background tabs pause).
+    void transitionLayer.offsetWidth;
+    transitionLayer.classList.add("is-handoff-fading");
+
+    window.setTimeout(finish, HANDOFF_FADE_MS + 120);
   }
 
   function cancelTransition() {
