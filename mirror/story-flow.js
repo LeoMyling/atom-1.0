@@ -1004,6 +1004,14 @@
   }
 
   function syncCurrentStateFromViewport() {
+    // Once committed to the footer/final state, never let a viewport re-scan demote
+    // it. The footer is mouse-scrub driven and reverse navigation is an explicit
+    // wheel/key/touch gesture (beginTransition), so a scroll-position guess here
+    // would only bounce the user back into the previous video/state.
+    if (currentState === FINAL_STATE_INDEX) {
+      return;
+    }
+
     var bestState = currentState;
     var bestDistance = Infinity;
     var anchor = window.innerHeight * 0.42;
@@ -1329,9 +1337,14 @@
     scrollToState(transition.toState);
     preloadAround(transition.toState);
 
-    // Reduced motion / no video: keep the original instant teardown so the
-    // reduced-motion experience is unchanged (no fade, no extra frames).
-    if (reducedMotion || !video) {
+    // Instant teardown (no hold-final-frame fade) for:
+    //  - reduced motion / no video (keep that experience unchanged), and
+    //  - the finalScrub 3->4 transition. The footer is taken over by the primed
+    //    footer scrub video (not a still to cross-fade), and the fade's ~200ms
+    //    delayed unlock let the footer settle and the viewport re-scan demote the
+    //    state back to Process — bouncing the user back into the previous video.
+    //    Unlocking in the next frame keeps currentState pinned at FINAL.
+    if (reducedMotion || !video || transition.finalScrub) {
       window.requestAnimationFrame(function () {
         finishTransition(transition, video);
       });

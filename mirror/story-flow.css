@@ -129,7 +129,11 @@ body.nt-story-active .sticky-nav {
 }
 
 @media (min-width: 992px) {
-  body.nt-story-active .nt-hero-cta {
+  /* Visible only on the hero / initial story state (data-nt-story-state="0") and
+     not while a transition video is already leaving the hero. Every later state
+     (Composed, Story-Led, Process, parallax, footer) keeps it hidden via the base
+     rule above, so the CTA is no longer static across the whole story. */
+  body.nt-story-active[data-nt-story-state="0"]:not(.nt-story-video-active) .nt-hero-cta {
     display: flex;
     position: fixed;
     left: 0;
@@ -139,13 +143,6 @@ body.nt-story-active .sticky-nav {
        on .hero-link by class (its reset animation is keyed to the original element,
        so this clone would otherwise stay translated 10em down). */
     transform: none !important;
-  }
-
-  /* Step aside for the footer/end state so it doesn't clash with footer CTAs. */
-  body.nt-story-active.nt-story-footer-active .nt-hero-cta {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
   }
 }
 
