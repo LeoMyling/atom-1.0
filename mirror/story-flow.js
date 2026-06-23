@@ -5,14 +5,8 @@
   var VIDEO_PLAYBACK_RATE = 1.9;
   var HANDOFF_FADE_MS = 200;
   var HANDOFF_DECODE_TIMEOUT_MS = 120;
+  var WHEEL_TRIGGER_DELTA = 4;
   var WHEEL_RESET_MS = 180;
-  // Wheel input is normalised to pixels before thresholding so one "beat" means the
-  // same physical effort on a pixel mouse, a line-mode wheel (e.g. Firefox/Windows)
-  // and a page-mode wheel — instead of comparing the raw, device-specific deltaY to
-  // a single magic number. See normalizeWheelDeltaPx / handleWheel.
-  var WHEEL_LINE_PX = 20;            // assumed px per line for deltaMode 1
-  var WHEEL_STEP_THRESHOLD_PX = 40;  // accumulated px needed to advance one beat
-  var WHEEL_RELEASE_MS = 140;        // quiet wheel gap required before the next step
   var TOUCH_TRIGGER_DELTA = 18;
   var FINAL_STATE_INDEX = 4;
   var PROCESS_STATE_INDEX = 3;
@@ -125,10 +119,7 @@
   var touchStartY = 0;
   var touchConsumed = false;
   var wheelDelta = 0;
-  var wheelDir = 0;
   var wheelResetTimer = 0;
-  var wheelReleaseTimer = 0;
-  var wheelArmed = true;
   var lockedScrollY = 0;
   var restSections = [];
   var targets = [];
@@ -961,10 +952,6 @@
   }
 
   function handleWheel(event) {
-    // Keep the post-step "quiet release" window alive on every wheel event (even
-    // while locked) so a trackpad's momentum tail can never roll into a 2nd beat.
-    noteWheelActivity();
-
     if (inputLocked) {
       stopInput(event);
       return;
@@ -990,38 +977,18 @@
     }
 
     stopInput(event);
-
-    // After a beat fires we disarm until the wheel is quiet for WHEEL_RELEASE_MS;
-    // momentum events keep arriving here and keep refreshing that window (above).
-    if (!wheelArmed) {
-      return;
-    }
-
-    // Reset the accumulator on a direction flip so an up-flick can't blend with a
-    // prior down-flick.
-    if (wheelDir && rawDirection !== wheelDir) {
-      wheelDelta = 0;
-    }
-    wheelDir = rawDirection;
-    wheelDelta += normalizeWheelDeltaPx(event);
-
-    // Drop a stale partial accumulation if the wheel goes idle mid-gesture.
+    wheelDelta += event.deltaY;
     window.clearTimeout(wheelResetTimer);
-    wheelResetTimer = window.setTimeout(resetWheelAccumulator, WHEEL_RESET_MS);
+    wheelResetTimer = window.setTimeout(function () {
+      wheelDelta = 0;
+    }, WHEEL_RESET_MS);
 
-    if (Math.abs(wheelDelta) < WHEEL_STEP_THRESHOLD_PX) {
+    var direction = getDirection(wheelDelta);
+    if (!direction || !canMove(direction)) {
       return;
     }
 
-    var direction = wheelDelta > 0 ? 1 : -1;
-    if (!canMove(direction)) {
-      resetWheelAccumulator();
-      return;
-    }
-
-    // Exactly one beat per gesture: clear the accumulator and disarm until quiet.
-    resetWheelAccumulator();
-    disarmWheelUntilQuiet();
+    wheelDelta = 0;
     beginTransition(currentState + direction);
   }
 
@@ -1134,46 +1101,12 @@
     return delta > 0 ? 1 : -1;
   }
 
-  // Normalise a wheel event to pixels so the step threshold is device-independent.
-  // deltaMode: 0 = pixels (use as-is), 1 = lines, 2 = pages.
-  function normalizeWheelDeltaPx(event) {
-    if (event.deltaMode === 1) {
-      return event.deltaY * WHEEL_LINE_PX;
+  function getDirection(delta) {
+    if (Math.abs(delta) < WHEEL_TRIGGER_DELTA) {
+      return 0;
     }
 
-    if (event.deltaMode === 2) {
-      return event.deltaY * (window.innerHeight || WHEEL_STEP_THRESHOLD_PX);
-    }
-
-    return event.deltaY;
-  }
-
-  function resetWheelAccumulator() {
-    wheelDelta = 0;
-    wheelDir = 0;
-    window.clearTimeout(wheelResetTimer);
-  }
-
-  // While disarmed (just after a beat) every wheel event extends the quiet window,
-  // so a long momentum tail keeps the gesture from producing a second beat. The
-  // wheel re-arms only once WHEEL_RELEASE_MS passes with no wheel events.
-  function noteWheelActivity() {
-    if (wheelArmed) {
-      return;
-    }
-
-    window.clearTimeout(wheelReleaseTimer);
-    wheelReleaseTimer = window.setTimeout(function () {
-      wheelArmed = true;
-    }, WHEEL_RELEASE_MS);
-  }
-
-  function disarmWheelUntilQuiet() {
-    wheelArmed = false;
-    window.clearTimeout(wheelReleaseTimer);
-    wheelReleaseTimer = window.setTimeout(function () {
-      wheelArmed = true;
-    }, WHEEL_RELEASE_MS);
+    return delta > 0 ? 1 : -1;
   }
 
   function canMove(direction) {
