@@ -7,10 +7,11 @@
   var WHEEL_RESET_MS = 180;
   var TOUCH_TRIGGER_DELTA = 18;
   var FINAL_STATE_INDEX = 4;
-  var FINAL_SCRUB_VIDEO = ASSET_ROOT + "chapter-4-forward.mp4";
+  var FINAL_SCRUB_VIDEO = ASSET_ROOT + "chapter-4-forward-scrub.mp4";
+  var FINAL_SCRUB_FPS = 24;
   var FINAL_SCRUB_EASE = 0.06;
   var FINAL_SCRUB_SETTLE_EPSILON = 0.0015;
-  var FINAL_SCRUB_SEEK_EPSILON = 0.01;
+  var FINAL_SCRUB_SEEK_EPSILON = 0.02;
   var LOCKED_KEYS = {
     ArrowDown: 1,
     PageDown: 1,
@@ -1667,7 +1668,9 @@
       finalScrubDisplayRatio += ratioDelta * FINAL_SCRUB_EASE;
     }
 
-    var targetTime = clamp(finalScrubDisplayRatio, 0, 1) * endTime;
+    var rawTime = clamp(finalScrubDisplayRatio, 0, 1) * endTime;
+    var frameDuration = 1 / FINAL_SCRUB_FPS;
+    var targetTime = clamp(Math.round(rawTime / frameDuration) * frameDuration, 0, endTime);
 
     if (!finalScrubVideo.paused) {
       finalScrubVideo.pause();
