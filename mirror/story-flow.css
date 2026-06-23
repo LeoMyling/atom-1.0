@@ -132,7 +132,7 @@ body.nt-story-active .hero-section.is-home:not(.power) > :not(.nt-story-hero-sta
 
 body.nt-story-active .hero-section.is-home:not(.power) > .column.middle,
 body.nt-story-active .hero-section.is-home:not(.power) > img.image-full,
-body.nt-story-active .hero-section.is-home:not(.power) canvas {
+body.nt-story-active .hero-section.is-home:not(.power) canvas:not(.nt-story-hero-fluid) {
   opacity: 0 !important;
   visibility: hidden !important;
   pointer-events: none !important;
@@ -173,8 +173,27 @@ body.nt-story-active .hero-section.is-home:not(.power) canvas {
 .nt-story-hero-water {
   z-index: 1;
   opacity: 1;
-  filter: blur(0.8px) saturate(1.08) contrast(1.04);
+  filter: saturate(1.05) contrast(1.03);
   transform: translateZ(0) scale(1.01);
+}
+
+.nt-story-hero-fluid {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 3;
+  display: block;
+  pointer-events: none;
+  transform: translateZ(0);
+}
+
+.nt-story-hero-static:not(.is-fluid-gl) .nt-story-hero-fluid {
+  display: none;
+}
+
+.nt-story-hero-static.is-fluid-gl .nt-story-hero-water {
+  opacity: 0;
 }
 
 .nt-story-hero-static.is-water-active .nt-story-hero-static-image {
