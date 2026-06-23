@@ -1,1 +1,5 @@
+# macOS
 .DS_Store
+
+# Browser-driven QA artifacts (Playwright MCP)
+.playwright-mcp/
