@@ -99,6 +99,37 @@ body.nt-story-active .sticky-nav {
   z-index: 10002 !important;
 }
 
+/* Restored bottom-left hero CTA (desktop-only). The original .hero-link.is-home
+   lives inside .hero-section (z-index:1 + isolation:isolate), so in story mode it
+   is clipped by the hero's overflow:hidden and painted beneath the story shell
+   (z-index:9997). This is the same markup rendered as a top-level page-wrapper
+   child so it pins to the viewport bottom-left, above the story and below the nav.
+   Hidden by default; shown only while the story is active on desktop. */
+.nt-hero-cta {
+  display: none;
+}
+
+@media (min-width: 992px) {
+  body.nt-story-active .nt-hero-cta {
+    display: flex;
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    z-index: 10001;
+    /* Neutralize the Webflow IX2 initial-state transform that gets injected inline
+       on .hero-link by class (its reset animation is keyed to the original element,
+       so this clone would otherwise stay translated 10em down). */
+    transform: none !important;
+  }
+
+  /* Step aside for the footer/end state so it doesn't clash with footer CTAs. */
+  body.nt-story-active.nt-story-footer-active .nt-hero-cta {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
 body.nt-story-active .logo-container,
 body.nt-story-active .mobile-logo {
   width: 42px;
