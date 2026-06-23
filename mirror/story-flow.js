@@ -1,6 +1,6 @@
 (function () {
   var ASSET_ROOT = "./story-assets/";
-  var HERO_IMAGE = ASSET_ROOT + "hero-static.jpeg";
+  var HERO_IMAGE = ASSET_ROOT + "hero-static.jpeg?v=frame-parity-20260623-1";
   var HERO_WATER_IMAGE = ASSET_ROOT + "hero-water.png";
   var VIDEO_PLAYBACK_RATE = 1.9;
   var WHEEL_TRIGGER_DELTA = 4;
@@ -29,28 +29,28 @@
       }
     },
     {
-      image: ASSET_ROOT + "story-point-1.png",
+      image: ASSET_ROOT + "story-point-1.png?v=frame-parity-20260623-1",
       text: {
         title: ["Composed", "Spaces"],
         subtitle: "Lasting Atmosphere."
       }
     },
     {
-      image: ASSET_ROOT + "story-point-2.png",
+      image: ASSET_ROOT + "story-point-2.png?v=frame-parity-20260623-1",
       text: {
         title: ["Story", "Led", "Spaces"],
         subtitle: "Interior Design, Composed."
       }
     },
     {
-      image: ASSET_ROOT + "story-point-3.png?v=image6-active-bg-20260622-1725",
+      image: ASSET_ROOT + "story-point-3.png?v=frame-parity-20260623-1",
       text: {
         title: ["Process"],
         subtitle: "Initial Atmosphere. Design Direction. Material Resolution."
       }
     },
     {
-      image: ASSET_ROOT + "puppy-finale-focused.jpg",
+      image: ASSET_ROOT + "puppy-finale-focused.jpg?v=frame-parity-20260623-1",
       text: {
         title: ["Jo", "Mendes"],
         subtitle: "Nomada Toast Services"
