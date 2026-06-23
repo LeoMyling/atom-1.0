@@ -588,8 +588,8 @@ body.nt-story-active .hero-section.is-home:not(.power) .hero-title-flex h1.headi
 }
 
 .nt-story-transition[data-final-scrub] .nt-story-transition-video {
-  animation: nt-story-final-video-takeover var(--nt-transition-duration, 1800ms) cubic-bezier(0.2, 0.72, 0.16, 1) both;
-  will-change: opacity, transform;
+  animation: nt-story-final-video-takeover var(--nt-final-takeover, 640ms) cubic-bezier(0.2, 0.72, 0.16, 1) both;
+  will-change: transform;
 }
 
 .nt-story-copy-rail {
@@ -706,19 +706,20 @@ body.nt-story-active .hero-section.is-home:not(.power) .hero-title-flex h1.headi
   }
 }
 
+/* Footer takeover: the dog video slides up over the still-mounted white quotes
+   overlay as a solid panel — the same parallax language as the overlay beats —
+   instead of cross-fading in by opacity over a re-revealed Process still. The
+   video is parked on its final frame (see seekToFinalFrame) and opaque throughout
+   (no opacity keyframe), so there is no "awkward fade"; the slide is short/fixed
+   (var --nt-final-takeover) so it reads as one more beat and the footer commits
+   right after it settles. */
 @keyframes nt-story-final-video-takeover {
-  0% {
-    opacity: 0;
-    transform: translate3d(0, 16vh, 0) scale(1.08);
+  from {
+    transform: translate3d(0, 100%, 0);
   }
 
-  28% {
-    opacity: 1;
-  }
-
-  100% {
-    opacity: 1;
-    transform: translate3d(0, 0, 0) scale(1);
+  to {
+    transform: translate3d(0, 0, 0);
   }
 }
 
@@ -862,40 +863,59 @@ body.nt-story-active .footer-section .footer-final::before {
   white-space: nowrap;
 }
 
+/* Footer content entrance. The snappy hand-off reveals the footer right after
+   the takeover slide, so the content must settle fast and almost together — a
+   short subtle fade + tiny rise (no long, late float). Durations ~320-340ms and
+   a tight 0-80ms stagger so everything is essentially in place with the dog. */
 body.nt-story-footer-active .footer-section .nav-container.is-footer,
 body.nt-story-footer-active .footer-section .footer-buttons,
 body.nt-story-footer-active .footer-section .footer-contact,
 body.nt-story-footer-active .footer-section .footer-cta-contain,
 body.nt-story-footer-active .footer-section .footer-legal-div {
-  animation: nt-story-footer-text-in 760ms cubic-bezier(0.2, 0.72, 0.16, 1) both;
+  animation: nt-story-footer-text-in 340ms cubic-bezier(0.2, 0.72, 0.16, 1) both;
   will-change: opacity, transform;
 }
 
 body.nt-story-footer-active .footer-section .footer-final::before {
-  animation: nt-story-text-line-in 940ms cubic-bezier(0.2, 0.72, 0.16, 1) both;
-  animation-delay: 120ms;
+  animation: nt-story-footer-final-in 320ms cubic-bezier(0.2, 0.72, 0.16, 1) both;
+  animation-delay: 0ms;
 }
 
 body.nt-story-footer-active .footer-section .footer-buttons {
-  animation-delay: 70ms;
+  animation-delay: 40ms;
 }
 
 body.nt-story-footer-active .footer-section .footer-contact {
-  animation-delay: 120ms;
+  animation-delay: 55ms;
 }
 
 body.nt-story-footer-active .footer-section .footer-cta-contain {
-  animation-delay: 180ms;
+  animation-delay: 70ms;
 }
 
 body.nt-story-footer-active .footer-section .footer-legal-div {
-  animation-delay: 240ms;
+  animation-delay: 80ms;
 }
 
 @keyframes nt-story-footer-text-in {
   from {
     opacity: 0;
-    transform: translate3d(0, 1rem, 0);
+    transform: translate3d(0, 0.45rem, 0);
+  }
+
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Footer headline settle: a short, em-small rise + fade so "Jo Mendes" lands in
+   its final layout position rather than floating up a full 6em line height late
+   in the hand-off. Matches the restrained entrance of the rest of the footer. */
+@keyframes nt-story-footer-final-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 0.14em, 0);
   }
 
   to {
@@ -928,6 +948,21 @@ body.nt-story-footer-active .footer-section .footer-legal-div {
 .nt-parallax-overlay.is-active {
   opacity: 1;
   visibility: visible;
+}
+
+/* While the overlay owns the screen, explicitly suppress the Process backdrop +
+   copy and the shared fixed still / body image, so nothing of the previous state
+   can show behind the overlay — or behind the transparent footer-takeover
+   transition layer that follows. visibility / opacity only (no display or height
+   change) so the locked scroll position never shifts. Placed after the
+   fixed-visual rules above so it also overrides .nt-story-fixed-visual.is-visible. */
+body.nt-parallax-active .nt-story-shell,
+body.nt-parallax-active .nt-story-fixed-visual {
+  visibility: hidden;
+}
+
+body.nt-parallax-active::before {
+  opacity: 0;
 }
 
 .nt-parallax-overlay-track {

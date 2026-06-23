@@ -12,6 +12,12 @@
   var PROCESS_STATE_INDEX = 3;
   var OVERLAY_BEATS = 2;
   var OVERLAY_BEAT_MS = 560;
+  // Footer takeover: the dog video parks on its final frame and slides up as a
+  // solid panel for FINAL_TAKEOVER_MS (mirrors CSS --nt-final-takeover), then we
+  // commit FINAL_TAKEOVER_SETTLE_MS later so the footer + its content arrive in
+  // rhythm with the beats instead of after the full ~2s arrival clip plays out.
+  var FINAL_TAKEOVER_MS = 640;
+  var FINAL_TAKEOVER_SETTLE_MS = 70;
   var PARALLAX_MARK_SVG =
     '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Nomada Toast">' +
     '<g fill="currentColor">' +
@@ -803,8 +809,9 @@
   }
 
   // While resting on Process (state 3) the overlay consumes forward/back input
-  // for its two beats before deferring to the real Process<->footer transition.
-  // Returns true when the input was handled by the overlay (do not transition).
+  // for its two beats, then the forward input past the last beat enters the footer
+  // DIRECTLY (no chapter-4 clip) — see enterFooterDirect. Returns true when the
+  // input was handled here (the caller must not run a normal transition).
   function maybeHandleProcessOverlay(toState) {
     if (!parallaxOverlayEnabled() || currentState !== PROCESS_STATE_INDEX) {
       return false;
@@ -817,7 +824,10 @@
         runOverlayBeat(overlayProgress + 1);
         return true;
       }
-      return false;
+      // Past the last beat: hand straight to the footer's own scrub video instead
+      // of mounting/playing chapter-4-forward.mp4 as a blocking transition.
+      enterFooterDirect();
+      return true;
     }
 
     if (overlayProgress > 0) {
@@ -828,6 +838,32 @@
     return false;
   }
 
+  // Parallax -> footer DIRECT entry. The footer scrub video is already mounted
+  // (buildFinalFooterVideo) and primed to its resting frame, and the footer is
+  // already scrub-ready (opacity 1, poster faded), so entering the final state is
+  // just: pin -> set state/classes -> reveal -> unlock. No dog transition clip is
+  // mounted or played, so there is no decode/seek hitch and no opacity fade-in.
+  // Mirrors the finalScrub commit (rAF unlock) so the viewport re-scan cannot
+  // demote FINAL back to Process (no bounce).
+  function enterFooterDirect() {
+    if (activeTransition) {
+      return;
+    }
+
+    inputLocked = true;
+    lockStoryScroll(PROCESS_STATE_INDEX);
+
+    currentState = FINAL_STATE_INDEX;
+    primeFinalScrubToRest();
+    setVisualForState(FINAL_STATE_INDEX);
+    scrollToState(FINAL_STATE_INDEX);
+    preloadAround(FINAL_STATE_INDEX);
+
+    window.requestAnimationFrame(function () {
+      unlockStoryScroll();
+    });
+  }
+
   // Advance/retract one beat. Scroll stays pinned at Process (deterministic, no
   // free-scroll, no jump); the white section translates via its CSS transition.
   function runOverlayBeat(nextProgress) {
@@ -836,6 +872,11 @@
     lockStoryScroll(PROCESS_STATE_INDEX);
     parallaxOverlay.classList.toggle("is-active", overlayProgress > 0);
     parallaxOverlay.setAttribute("data-step", String(overlayProgress));
+    // Explicit ownership flag (not paint-order luck): while the overlay owns the
+    // screen, CSS suppresses the Process backdrop, copy and the shared fixed
+    // still so nothing of the previous state can show behind the overlay — or
+    // behind the transparent footer-takeover transition layer that follows.
+    document.body.classList.toggle("nt-parallax-active", overlayProgress > 0);
 
     window.clearTimeout(overlayTimer);
     overlayTimer = window.setTimeout(function () {
@@ -848,6 +889,7 @@
   }
 
   function resetParallaxOverlay() {
+    document.body.classList.remove("nt-parallax-active");
     if (!parallaxOverlay) {
       return;
     }
@@ -1247,9 +1289,6 @@
     video.playbackRate = VIDEO_PLAYBACK_RATE;
     video.classList.add("nt-story-transition-video");
     video.setAttribute("data-active-transition", "true");
-    video.onended = function () {
-      commitTransition(transition, video);
-    };
     video.onerror = function () {
       commitTransition(transition, video);
     };
@@ -1259,11 +1298,35 @@
     applyHeroThreadAnchor(transition);
 
     if (transition.finalScrub) {
-      transitionLayer.replaceChildren(createTransitionUnderlay(transition), video);
-    } else {
+      // Footer takeover: the desktop parallax quotes overlay is still mounted and
+      // owns the screen beneath this (transparent) transition layer, so we omit
+      // the Process still underlay AND the copy thread. Re-mounting either would
+      // re-reveal the Process backdrop and the "Process" thread copy we just
+      // covered, reading as a remnant/bounce. Instead the dog video slides up
+      // over the quotes as a parallax continuation (see CSS final-video-takeover).
+      //
+      // Snappy hand-off: we do NOT play the ~2s arrival clip and wait for it to
+      // end before revealing the footer. We park the dog on its final resting
+      // frame and slide that up as a solid panel, then commit once the slide
+      // settles — so the footer and its content arrive in rhythm with the beats
+      // instead of after a long blank-dog tail. commitTransition primes the footer
+      // scrub video to the same final frame, so the swap is seamless and
+      // mouse-scrub still owns the dog afterwards.
+      transitionLayer.style.setProperty("--nt-final-takeover", FINAL_TAKEOVER_MS + "ms");
+      seekToFinalFrame(video);
       transitionLayer.replaceChildren(video);
+      transitionLayer.classList.add("is-visible");
+      document.body.classList.add("nt-story-video-active");
+      window.setTimeout(function () {
+        commitTransition(transition, video);
+      }, FINAL_TAKEOVER_MS + FINAL_TAKEOVER_SETTLE_MS);
+      return;
     }
 
+    video.onended = function () {
+      commitTransition(transition, video);
+    };
+    transitionLayer.replaceChildren(video);
     mountTransitionText(transition, video);
     transitionLayer.classList.add("is-visible");
     document.body.classList.add("nt-story-video-active");
@@ -1273,6 +1336,22 @@
       playPromise.catch(function () {
         commitTransition(transition, video);
       });
+    }
+  }
+
+  // Park a (loaded) transition video on its final frame so it can be slid up as a
+  // static panel for the footer takeover. The destination footer scrub video is
+  // primed to the same final frame at commit, so the panel -> footer swap is
+  // seamless and never shows an early arrival pose.
+  function seekToFinalFrame(video) {
+    if (!isVideoDurationReady(video)) {
+      return;
+    }
+    try {
+      video.pause();
+      video.currentTime = Math.max(0, video.duration - 0.05);
+    } catch (error) {
+      window.console.warn("Footer takeover could not park the dog video on its final frame.", error);
     }
   }
 
@@ -1682,7 +1761,18 @@
   }
 
   function primeFinalScrubFromTransition(transition) {
-    if (!transition.finalScrub || !finalScrubVideo || !isVideoDurationReady(finalScrubVideo)) {
+    if (!transition.finalScrub) {
+      return;
+    }
+    primeFinalScrubToRest();
+  }
+
+  // Pin the footer scrub video to its resting (final) frame. Called early (as soon
+  // as the video is ready) so the footer can be revealed directly with the dog
+  // already at rest — no frame-0 flash, no clip to play — and again on entry to
+  // re-assert rest after any pre-arrival mouse movement.
+  function primeFinalScrubToRest() {
+    if (!finalScrubVideo || !isVideoDurationReady(finalScrubVideo)) {
       return;
     }
 
@@ -1693,7 +1783,7 @@
     try {
       finalScrubVideo.currentTime = Math.max(0, finalScrubVideo.duration - 0.02);
     } catch (error) {
-      window.console.warn("Footer scrub video could not be primed after transition.", error);
+      window.console.warn("Footer scrub video could not be primed to its resting frame.", error);
     }
   }
 
@@ -1879,6 +1969,10 @@
     finalScrubVideoReady = true;
     finalScrubVideo.pause();
     document.body.classList.add("nt-story-footer-scrub-ready");
+    // Sit on the resting frame from the moment it is ready, so the direct
+    // parallax -> footer reveal shows the dog at rest immediately (no frame-0
+    // flash). Harmless before arrival: the scrub seek only runs in FINAL state.
+    primeFinalScrubToRest();
     scheduleFinalScrubUpdate();
 
     if (finalScrubResolve) {
