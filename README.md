@@ -8,6 +8,25 @@ captured Webflow runtime.
 
 GitHub: [LeoMyling/atom-1.0](https://github.com/LeoMyling/atom-1.0)
 
+## Project Scope
+
+This is a **frontend-only static showcase site** — it is **desktop-first /
+desktop-only** for presentation purposes. Keep changes within that scope:
+
+- **`mirror/` is the deployable static frontend.** It is the actual website and
+  the only thing that ships. Everything else in the repo is source media, audit
+  docs, or tooling (see [Repository structure](#repository-structure)).
+- **Desktop is the primary validation target.** Design, QA, and cleanup
+  decisions are made against the desktop presentation.
+- **Mobile/tablet may remain functional but must not drive decisions.** Do not
+  let small-viewport behavior dictate design changes, refactors, or cleanup.
+  Leave existing responsive behavior as-is unless a specific mobile fix is
+  requested.
+- **Out of scope unless explicitly requested:** backend systems, CMS, auth,
+  databases, API routes, build tooling, mobile-specific pages, and responsive
+  redesign work. This is a static showcase, not an application — don't introduce
+  those layers on your own initiative.
+
 ## Running locally
 
 The site is fully static — serve the `mirror/` directory with any static file
