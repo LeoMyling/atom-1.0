@@ -9,6 +9,15 @@
   var WHEEL_RESET_MS = 180;
   var TOUCH_TRIGGER_DELTA = 18;
   var FINAL_STATE_INDEX = 4;
+  var PROCESS_STATE_INDEX = 3;
+  var OVERLAY_BEATS = 2;
+  var OVERLAY_BEAT_MS = 560;
+  var PARALLAX_MARK_SVG =
+    '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Nomada Toast">' +
+    '<g fill="currentColor">' +
+    '<rect x="42.5" y="9" width="15" height="82" rx="7"/>' +
+    '<rect x="9" y="42.5" width="82" height="15" rx="7"/>' +
+    "</g></svg>";
   var FINAL_SCRUB_VIDEO = ASSET_ROOT + "chapter-4-forward-scrub.mp4";
   var FINAL_SCRUB_FPS = 24;
   var FINAL_SCRUB_EASE = 0.06;
@@ -41,14 +50,24 @@
       image: ASSET_ROOT + "story-point-2.png?v=frame-parity-20260623-1",
       text: {
         title: ["Story", "Led", "Spaces"],
-        subtitle: "Interior Design, Composed."
+        subtitle: "Interior Design, Composed.",
+        note: {
+          text: "Every project begins with atmosphere, then moves through rhythm, material, light, and use until the space feels resolved.",
+          placement: "below",
+          variant: "boxed"
+        }
       }
     },
     {
       image: ASSET_ROOT + "story-point-3.png?v=frame-parity-20260623-1",
       text: {
         title: ["Process"],
-        subtitle: "Initial Atmosphere. Design Direction. Material Resolution."
+        subtitle: "Initial Atmosphere. Design Direction. Material Resolution.",
+        note: {
+          text: "From atmosphere to resolution, each decision is shaped with restraint, clarity, and intent.",
+          placement: "above",
+          variant: "lede"
+        }
       }
     },
     {
@@ -98,6 +117,9 @@
   var lockedScrollY = 0;
   var restSections = [];
   var targets = [];
+  var parallaxOverlay = null;
+  var overlayProgress = 0;
+  var overlayTimer = 0;
   var transitionLayer;
   var fixedVisualLayer;
   var fixedVisualImage;
@@ -141,6 +163,7 @@
     buildFixedVisualLayer();
     buildTransitionLayer();
     buildFinalFooterVideo(footer);
+    buildParallaxOverlay();
     targets = [hero].concat(restSections).concat([footer]);
 
     setVisualForState(0);
@@ -737,6 +760,103 @@
     document.body.appendChild(transitionLayer);
   }
 
+  // Clone the mirror's existing testimonial quotes grid into a fixed overlay
+  // that sits above the Process backdrop. The grid is reused verbatim; only the
+  // inert WebGL centre canvas is swapped for a static red Nomada mark. Layout
+  // and engagement are gated to desktop via CSS + parallaxOverlayEnabled().
+  function buildParallaxOverlay() {
+    var source = document.querySelector(".quotes-container");
+    if (!source) {
+      return;
+    }
+
+    parallaxOverlay = document.createElement("div");
+    parallaxOverlay.className = "nt-parallax-overlay";
+    parallaxOverlay.setAttribute("aria-hidden", "true");
+    parallaxOverlay.setAttribute("data-step", "0");
+    parallaxOverlay.style.setProperty("--nt-overlay-beat", OVERLAY_BEAT_MS + "ms");
+
+    var track = document.createElement("div");
+    track.className = "nt-parallax-overlay-track";
+
+    var clone = source.cloneNode(true);
+    clone.querySelectorAll("[id]").forEach(function (node) {
+      node.removeAttribute("id");
+    });
+
+    var markHost = clone.querySelector(".webgl-container");
+    if (markHost) {
+      markHost.classList.add("nt-parallax-mark");
+      markHost.innerHTML = PARALLAX_MARK_SVG;
+    }
+    clone.querySelectorAll("canvas").forEach(function (canvas) {
+      canvas.remove();
+    });
+
+    track.appendChild(clone);
+    parallaxOverlay.appendChild(track);
+    document.body.appendChild(parallaxOverlay);
+  }
+
+  function parallaxOverlayEnabled() {
+    return !!parallaxOverlay && !reducedMotion && window.matchMedia("(min-width: 992px)").matches;
+  }
+
+  // While resting on Process (state 3) the overlay consumes forward/back input
+  // for its two beats before deferring to the real Process<->footer transition.
+  // Returns true when the input was handled by the overlay (do not transition).
+  function maybeHandleProcessOverlay(toState) {
+    if (!parallaxOverlayEnabled() || currentState !== PROCESS_STATE_INDEX) {
+      return false;
+    }
+
+    var direction = toState > currentState ? 1 : -1;
+
+    if (direction > 0) {
+      if (overlayProgress < OVERLAY_BEATS) {
+        runOverlayBeat(overlayProgress + 1);
+        return true;
+      }
+      return false;
+    }
+
+    if (overlayProgress > 0) {
+      runOverlayBeat(overlayProgress - 1);
+      return true;
+    }
+
+    return false;
+  }
+
+  // Advance/retract one beat. Scroll stays pinned at Process (deterministic, no
+  // free-scroll, no jump); the white section translates via its CSS transition.
+  function runOverlayBeat(nextProgress) {
+    overlayProgress = nextProgress;
+    inputLocked = true;
+    lockStoryScroll(PROCESS_STATE_INDEX);
+    parallaxOverlay.classList.toggle("is-active", overlayProgress > 0);
+    parallaxOverlay.setAttribute("data-step", String(overlayProgress));
+
+    window.clearTimeout(overlayTimer);
+    overlayTimer = window.setTimeout(function () {
+      if (overlayProgress === 0) {
+        unlockStoryScroll();
+      } else {
+        inputLocked = false;
+      }
+    }, OVERLAY_BEAT_MS + 80);
+  }
+
+  function resetParallaxOverlay() {
+    if (!parallaxOverlay) {
+      return;
+    }
+    window.clearTimeout(overlayTimer);
+    overlayProgress = 0;
+    parallaxOverlay.classList.remove("is-active");
+    parallaxOverlay.setAttribute("data-step", "0");
+  }
+
   function buildFixedVisualLayer() {
     fixedVisualLayer = document.createElement("div");
     fixedVisualLayer.className = "nt-story-fixed-visual";
@@ -1036,6 +1156,10 @@
   }
 
   function beginTransition(toState) {
+    if (maybeHandleProcessOverlay(toState)) {
+      return;
+    }
+
     var transition = createTransition(toState);
 
     if (!transition || inputLocked) {
@@ -1322,6 +1446,23 @@
       wrap.appendChild(subtitle);
     }
 
+    // Optional extra paragraph that lives inside the copy block, so it travels
+    // with the story thread during transitions just like the title/subtitle.
+    // placement "above" puts it before the headline (e.g. the right-aligned
+    // Process lede); otherwise it sits beneath the subtitle (e.g. the boxed
+    // Story-Led note).
+    if (text.note && text.note.text) {
+      var note = document.createElement("p");
+      note.className = "nt-story-copy-note is-" + (text.note.variant || "boxed");
+      note.textContent = text.note.text;
+      note.style.setProperty("--nt-note-delay", (settings.enterDelay + 220 + text.title.length * 70) + "ms");
+      if (text.note.placement === "above") {
+        wrap.insertBefore(note, wrap.firstChild);
+      } else {
+        wrap.appendChild(note);
+      }
+    }
+
     return wrap;
   }
 
@@ -1466,6 +1607,13 @@
   function setVisualForState(state) {
     document.body.setAttribute("data-nt-story-state", String(state));
     document.body.classList.toggle("nt-story-footer-active", state === FINAL_STATE_INDEX);
+
+    // Any committed move off Process clears the parallax overlay so it is hidden
+    // at the footer and re-armed cleanly the next time Process is reached.
+    if (state !== PROCESS_STATE_INDEX) {
+      resetParallaxOverlay();
+    }
+
     syncRestBackgrounds(state);
     scheduleFinalScrubUpdate();
 
