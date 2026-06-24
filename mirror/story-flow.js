@@ -7,6 +7,13 @@
   var HANDOFF_DECODE_TIMEOUT_MS = 120;
   var WHEEL_TRIGGER_DELTA = 4;
   var WHEEL_RESET_MS = 180;
+  // Trackpad momentum guard: for a brief window after a transition unlocks, swallow
+  // the small, high-frequency inertia ("momentum") wheel events a trackpad keeps
+  // emitting, so one physical flick cannot roll into extra story beats. A decisive
+  // mouse notch (|deltaY| >= WHEEL_DECISIVE_DELTA) is exempt, so mouse-wheel feel is
+  // unchanged. Pixel mice report ~100/notch; trackpad inertia events are far smaller.
+  var WHEEL_MOMENTUM_GUARD_MS = 300;
+  var WHEEL_DECISIVE_DELTA = 50;
   var TOUCH_TRIGGER_DELTA = 18;
   var FINAL_STATE_INDEX = 4;
   var PROCESS_STATE_INDEX = 3;
@@ -120,6 +127,7 @@
   var touchConsumed = false;
   var wheelDelta = 0;
   var wheelResetTimer = 0;
+  var lastUnlockTs = 0;
   var lockedScrollY = 0;
   var restSections = [];
   var targets = [];
@@ -973,6 +981,16 @@
         stopInput(event);
         scrollToState(FINAL_STATE_INDEX);
       }
+      return;
+    }
+
+    // Trackpad momentum guard: just after a transition unlocks, swallow the small
+    // inertia events so one flick's momentum tail cannot trigger an extra beat. A
+    // decisive mouse notch (|deltaY| >= WHEEL_DECISIVE_DELTA) bypasses this, so the
+    // mouse-wheel path is unchanged.
+    if (Date.now() - lastUnlockTs < WHEEL_MOMENTUM_GUARD_MS &&
+        Math.abs(event.deltaY) < WHEEL_DECISIVE_DELTA) {
+      stopInput(event);
       return;
     }
 
@@ -2085,6 +2103,7 @@
 
   function unlockStoryScroll() {
     inputLocked = false;
+    lastUnlockTs = Date.now();
     document.documentElement.classList.remove("nt-story-lock");
     document.body.classList.remove("nt-story-transitioning");
 
