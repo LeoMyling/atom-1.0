@@ -925,6 +925,31 @@ body.nt-story-footer-active .footer-section .footer-legal-div {
 }
 
 /* ============================================================
+   Finale scene: promote the REAL footer into a fixed full-viewport reveal layer
+   that sits behind the testimonial overlay, so the final beat reveals it (no
+   clone, no chapter-4 clip). Keeps the footer's existing z-index:9997 + isolation
+   (proven to sit between the Process still z9996 and the overlay z9997). The
+   footer is exactly viewport-height, so being fixed needs no scroll.
+   ============================================================ */
+body.nt-finale-active footer.footer-section {
+  position: fixed;
+  inset: 0;
+  height: 100vh;
+}
+
+/* The footer is revealed in place by the overlay lift, so suppress the per-element
+   entrance animations here (they belong to the reduced-motion / fallback path);
+   placed after the .nt-story-footer-active rules above so it overrides them. */
+body.nt-finale-active .footer-section .nav-container.is-footer,
+body.nt-finale-active .footer-section .footer-buttons,
+body.nt-finale-active .footer-section .footer-contact,
+body.nt-finale-active .footer-section .footer-cta-contain,
+body.nt-finale-active .footer-section .footer-legal-div,
+body.nt-finale-active .footer-section .footer-final::before {
+  animation: none;
+}
+
+/* ============================================================
    Desktop-only parallax testimonial overlay (Process -> footer).
    A tall white section, cloned at build time from the mirror's
    existing quotes grid, is pinned over the static Process state
@@ -943,11 +968,23 @@ body.nt-story-footer-active .footer-section .footer-legal-div {
   pointer-events: none;
   contain: paint;
   transform: translateZ(0);
+  /* Finale reveal (data-step 3): the whole white panel slides up off the top to
+     reveal the real footer mounted beneath. Only steps 2<->3 change this
+     transform, so the beat 0/1/2 track motion is unaffected. */
+  transition: transform var(--nt-finale-reveal, 640ms) cubic-bezier(0.2, 0.72, 0.16, 1);
 }
 
 .nt-parallax-overlay.is-active {
   opacity: 1;
   visibility: visible;
+}
+
+/* Final beat: lift the whole white overlay up and off, revealing the real footer
+   (promoted to a fixed reveal layer via body.nt-finale-active) that already sits
+   beneath it. A solid transform slide -- no opacity fade, no chapter-4 clip.
+   Reverse (3 -> 2) animates it straight back down to re-cover the footer. */
+.nt-parallax-overlay[data-step="3"] {
+  transform: translate3d(0, -100%, 0);
 }
 
 /* While the overlay owns the screen, explicitly suppress the Process backdrop +
@@ -985,7 +1022,8 @@ body.nt-parallax-active::before {
   transform: translateY(0);
 }
 
-.nt-parallax-overlay[data-step="2"] .nt-parallax-overlay-track {
+.nt-parallax-overlay[data-step="2"] .nt-parallax-overlay-track,
+.nt-parallax-overlay[data-step="3"] .nt-parallax-overlay-track {
   transform: translateY(calc(100vh - 100%));
 }
 
