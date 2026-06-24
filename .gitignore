@@ -3,3 +3,4 @@
 
 # Browser-driven QA artifacts (Playwright MCP)
 .playwright-mcp/
+.vercel
