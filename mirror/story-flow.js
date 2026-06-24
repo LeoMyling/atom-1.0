@@ -19,6 +19,9 @@
   var PROCESS_STATE_INDEX = 3;
   var OVERLAY_BEATS = 2;
   var OVERLAY_BEAT_MS = 560;
+  // overlayProgress reaches this once the two testimonial beats are done and the
+  // overlay slides up to reveal the real footer (the finale's third "beat").
+  var FINALE_REVEAL_PROGRESS = 3;
   // Footer takeover: the dog video parks on its final frame and slides up as a
   // solid panel for FINAL_TAKEOVER_MS (mirrors CSS --nt-final-takeover), then we
   // commit FINAL_TAKEOVER_SETTLE_MS later so the footer + its content arrive in
@@ -34,6 +37,11 @@
   var FINAL_SCRUB_VIDEO = ASSET_ROOT + "chapter-4-forward-scrub.mp4";
   var FINAL_SCRUB_FPS = 24;
   var FINAL_SCRUB_EASE = 0.06;
+  // Larger pointer jumps (notably the first move away from the resting frame on
+  // footer arrival) close at FAST ease so the dog responds immediately; fine
+  // movements keep the silky low ease. Gap is measured in scrub ratio (0..1).
+  var FINAL_SCRUB_EASE_FAST = 0.2;
+  var FINAL_SCRUB_SNAP_GAP = 0.18;
   var FINAL_SCRUB_SETTLE_EPSILON = 0.0015;
   var FINAL_SCRUB_SEEK_EPSILON = 0.02;
   var LOCKED_KEYS = {
@@ -134,6 +142,7 @@
   var parallaxOverlay = null;
   var overlayProgress = 0;
   var overlayTimer = 0;
+  var finaleActive = false;
   var transitionLayer;
   var fixedVisualLayer;
   var fixedVisualImage;
@@ -789,6 +798,7 @@
     parallaxOverlay.setAttribute("aria-hidden", "true");
     parallaxOverlay.setAttribute("data-step", "0");
     parallaxOverlay.style.setProperty("--nt-overlay-beat", OVERLAY_BEAT_MS + "ms");
+    parallaxOverlay.style.setProperty("--nt-finale-reveal", FINAL_TAKEOVER_MS + "ms");
 
     var track = document.createElement("div");
     track.className = "nt-parallax-overlay-track";
@@ -816,83 +826,154 @@
     return !!parallaxOverlay && !reducedMotion && window.matchMedia("(min-width: 992px)").matches;
   }
 
-  // While resting on Process (state 3) the overlay consumes forward/back input
-  // for its two beats, then the forward input past the last beat enters the footer
-  // DIRECTLY (no chapter-4 clip) — see enterFooterDirect. Returns true when the
-  // input was handled here (the caller must not run a normal transition).
+  // ============================================================
+  // Finale scene (desktop): Process (state 3) <-> testimonial beats <-> footer, as
+  // ONE reversible scene owned by overlayProgress -- not a separate footer entry:
+  //   0 = Process            (footer not promoted, overlay hidden)
+  //   1 = testimonial beat 1 (real footer promoted to a fixed layer BEHIND overlay)
+  //   2 = testimonial beat 2
+  //   3 = footer revealed    (overlay slides up off; commit currentState = FINAL)
+  // The real .footer-section is promoted to a fixed full-viewport reveal layer via
+  // body.nt-finale-active, so the final beat REVEALS it -- no clone, no chapter-4
+  // clip, no document-scroll jump. Forward and reverse run the same motion. The
+  // scene stays scroll-locked throughout (the fixed overlay/footer cover the
+  // viewport, so the locked scroll position is never seen). The reduced-motion /
+  // overlay-disabled fallback still uses the chapter-4 edge (createTransition).
+  // Returns true when the input was handled here (caller must not run a transition).
+  // ============================================================
   function maybeHandleProcessOverlay(toState) {
-    if (!parallaxOverlayEnabled() || currentState !== PROCESS_STATE_INDEX) {
+    if (!parallaxOverlayEnabled()) {
       return false;
     }
 
     var direction = toState > currentState ? 1 : -1;
+
+    // Reverse out of the revealed footer: re-cover it with testimonial beat 2 and
+    // demote FINAL -> Process. Never plays chapter-4-reverse.mp4 on this path.
+    if (currentState === FINAL_STATE_INDEX) {
+      if (direction < 0 && overlayProgress === FINALE_REVEAL_PROGRESS) {
+        retractFromFooter();
+        return true;
+      }
+      return false;
+    }
+
+    if (currentState !== PROCESS_STATE_INDEX) {
+      return false;
+    }
 
     if (direction > 0) {
       if (overlayProgress < OVERLAY_BEATS) {
         runOverlayBeat(overlayProgress + 1);
         return true;
       }
-      // Past the last beat: hand straight to the footer's own scrub video instead
-      // of mounting/playing chapter-4-forward.mp4 as a blocking transition.
-      enterFooterDirect();
+      // Past the last testimonial beat: reveal the pre-mounted real footer.
+      revealFooter();
       return true;
     }
 
-    if (overlayProgress > 0) {
+    // Reverse within the Process sub-phase.
+    if (overlayProgress > 1) {
       runOverlayBeat(overlayProgress - 1);
+      return true;
+    }
+    if (overlayProgress === 1) {
+      exitFinaleToProcess();
       return true;
     }
 
     return false;
   }
 
-  // Parallax -> footer DIRECT entry. The footer scrub video is already mounted
-  // (buildFinalFooterVideo) and primed to its resting frame, and the footer is
-  // already scrub-ready (opacity 1, poster faded), so entering the final state is
-  // just: pin -> set state/classes -> reveal -> unlock. No dog transition clip is
-  // mounted or played, so there is no decode/seek hitch and no opacity fade-in.
-  // Mirrors the finalScrub commit (rAF unlock) so the viewport re-scan cannot
-  // demote FINAL back to Process (no bounce).
-  function enterFooterDirect() {
-    if (activeTransition) {
-      return;
-    }
-
-    inputLocked = true;
-    lockStoryScroll(PROCESS_STATE_INDEX);
-
-    currentState = FINAL_STATE_INDEX;
+  // Promote the real footer into a fixed full-viewport reveal layer that sits
+  // BEHIND the testimonial overlay, primed to its resting frame. It is exactly
+  // viewport-height, so being fixed (out of flow) needs no scroll while the scene
+  // is locked. Called once, when the scene is first entered (beat 0 -> 1).
+  function enterFinaleScene() {
+    finaleActive = true;
+    document.body.classList.add("nt-finale-active");
     primeFinalScrubToRest();
-    setVisualForState(FINAL_STATE_INDEX);
-    scrollToState(FINAL_STATE_INDEX);
-    preloadAround(FINAL_STATE_INDEX);
-
-    window.requestAnimationFrame(function () {
-      unlockStoryScroll();
-    });
   }
 
-  // Advance/retract one beat. Scroll stays pinned at Process (deterministic, no
-  // free-scroll, no jump); the white section translates via its CSS transition.
+  // Advance/retract a testimonial beat (1 or 2). Entering the scene promotes the
+  // footer; scroll stays pinned at Process; the white section translates via CSS.
   function runOverlayBeat(nextProgress) {
+    if (overlayProgress === 0 && nextProgress > 0) {
+      enterFinaleScene();
+    }
     overlayProgress = nextProgress;
     inputLocked = true;
     lockStoryScroll(PROCESS_STATE_INDEX);
-    parallaxOverlay.classList.toggle("is-active", overlayProgress > 0);
+    parallaxOverlay.classList.add("is-active");
     parallaxOverlay.setAttribute("data-step", String(overlayProgress));
-    // Explicit ownership flag (not paint-order luck): while the overlay owns the
-    // screen, CSS suppresses the Process backdrop, copy and the shared fixed
-    // still so nothing of the previous state can show behind the overlay — or
-    // behind the transparent footer-takeover transition layer that follows.
-    document.body.classList.toggle("nt-parallax-active", overlayProgress > 0);
+    // While the overlay owns the screen, CSS suppresses the Process backdrop, copy
+    // and the shared fixed still so nothing of the previous state shows behind it.
+    document.body.classList.add("nt-parallax-active");
 
     window.clearTimeout(overlayTimer);
     overlayTimer = window.setTimeout(function () {
-      if (overlayProgress === 0) {
-        unlockStoryScroll();
-      } else {
-        inputLocked = false;
-      }
+      inputLocked = false;
+      lastUnlockTs = Date.now();
+    }, OVERLAY_BEAT_MS + 80);
+  }
+
+  // Final beat (2 -> 3): slide the white overlay up and off (data-step 3) to reveal
+  // the already-mounted real footer beneath, then commit FINAL once it settles. No
+  // chapter-4 clip, no opacity fade, no scroll jump. Stays scroll-locked; input is
+  // re-enabled (not unlocked) so a reverse gesture can retract.
+  function revealFooter() {
+    overlayProgress = FINALE_REVEAL_PROGRESS;
+    inputLocked = true;
+    lockStoryScroll(PROCESS_STATE_INDEX);
+    parallaxOverlay.classList.add("is-active");
+    parallaxOverlay.setAttribute("data-step", String(FINALE_REVEAL_PROGRESS));
+
+    window.clearTimeout(overlayTimer);
+    overlayTimer = window.setTimeout(function () {
+      currentState = FINAL_STATE_INDEX;
+      primeFinalScrubToRest();
+      setVisualForState(FINAL_STATE_INDEX);
+      inputLocked = false;
+      lastUnlockTs = Date.now();
+    }, FINAL_TAKEOVER_MS + FINAL_TAKEOVER_SETTLE_MS);
+  }
+
+  // Reverse the reveal (FINAL -> beat 2): slide the overlay back down over the
+  // footer and demote FINAL -> Process sub-phase. The footer stays promoted (still
+  // behind the overlay). No chapter-4-reverse.mp4.
+  function retractFromFooter() {
+    overlayProgress = OVERLAY_BEATS;
+    inputLocked = true;
+    lockStoryScroll(PROCESS_STATE_INDEX);
+    currentState = PROCESS_STATE_INDEX;
+    setVisualForState(PROCESS_STATE_INDEX);
+    parallaxOverlay.classList.add("is-active");
+    parallaxOverlay.setAttribute("data-step", String(OVERLAY_BEATS));
+    document.body.classList.add("nt-parallax-active");
+
+    window.clearTimeout(overlayTimer);
+    overlayTimer = window.setTimeout(function () {
+      inputLocked = false;
+      lastUnlockTs = Date.now();
+    }, FINAL_TAKEOVER_MS + FINAL_TAKEOVER_SETTLE_MS);
+  }
+
+  // Exit the scene back to the normal Process rest state (beat 1 -> 0). De-promote
+  // the footer FIRST (while the overlay still covers) so hiding the overlay reveals
+  // the Process still beneath -- not the footer -- then unlock for normal nav.
+  function exitFinaleToProcess() {
+    overlayProgress = 0;
+    inputLocked = true;
+    lockStoryScroll(PROCESS_STATE_INDEX);
+    finaleActive = false;
+    document.body.classList.remove("nt-finale-active");
+    parallaxOverlay.setAttribute("data-step", "0");
+
+    window.clearTimeout(overlayTimer);
+    overlayTimer = window.setTimeout(function () {
+      resetParallaxOverlay();
+      setVisualForState(PROCESS_STATE_INDEX);
+      unlockStoryScroll();
     }, OVERLAY_BEAT_MS + 80);
   }
 
@@ -972,7 +1053,11 @@
 
     if (rawDirection > 0 && isFinalStateActive()) {
       stopInput(event);
-      scrollToState(FINAL_STATE_INDEX);
+      // In the finale scene the footer is a fixed layer covering the viewport, so
+      // there is nothing to scroll to -- just swallow the forward input.
+      if (!finaleActive) {
+        scrollToState(FINAL_STATE_INDEX);
+      }
       return;
     }
 
@@ -1075,12 +1160,19 @@
     }
 
     if (!direction) {
+      // During the finale scene the page is scroll-locked anyway, but explicitly
+      // swallow Home/End so they can never jump to the header/footer mid-scene.
+      if (finaleActive && (event.key === "Home" || event.key === "End")) {
+        stopInput(event);
+      }
       return;
     }
 
     if (direction > 0 && isFinalStateActive()) {
       stopInput(event);
-      scrollToState(FINAL_STATE_INDEX);
+      if (!finaleActive) {
+        scrollToState(FINAL_STATE_INDEX);
+      }
       return;
     }
 
@@ -1187,8 +1279,9 @@
     // Once committed to the footer/final state, never let a viewport re-scan demote
     // it. The footer is mouse-scrub driven and reverse navigation is an explicit
     // wheel/key/touch gesture (beginTransition), so a scroll-position guess here
-    // would only bounce the user back into the previous video/state.
-    if (currentState === FINAL_STATE_INDEX) {
+    // would only bounce the user back into the previous video/state. Likewise the
+    // whole finale scene (finaleActive / overlayProgress > 0) owns its own state.
+    if (currentState === FINAL_STATE_INDEX || finaleActive || overlayProgress > 0) {
       return;
     }
 
@@ -1706,8 +1799,10 @@
     document.body.classList.toggle("nt-story-footer-active", state === FINAL_STATE_INDEX);
 
     // Any committed move off Process clears the parallax overlay so it is hidden
-    // at the footer and re-armed cleanly the next time Process is reached.
-    if (state !== PROCESS_STATE_INDEX) {
+    // and re-armed cleanly the next time Process is reached. During the finale
+    // scene the overlay is driven explicitly (revealFooter / retractFromFooter /
+    // exitFinaleToProcess), so don't auto-reset it here.
+    if (state !== PROCESS_STATE_INDEX && !finaleActive) {
       resetParallaxOverlay();
     }
 
@@ -2033,7 +2128,11 @@
     if (Math.abs(ratioDelta) <= FINAL_SCRUB_SETTLE_EPSILON) {
       finalScrubDisplayRatio = finalScrubRatio;
     } else {
-      finalScrubDisplayRatio += ratioDelta * FINAL_SCRUB_EASE;
+      // Big gaps (e.g. the first move off the resting frame right after footer
+      // arrival) catch up fast so the scrub feels immediately responsive; small
+      // movements keep the silky low ease.
+      var ease = Math.abs(ratioDelta) > FINAL_SCRUB_SNAP_GAP ? FINAL_SCRUB_EASE_FAST : FINAL_SCRUB_EASE;
+      finalScrubDisplayRatio += ratioDelta * ease;
     }
 
     var rawTime = clamp(finalScrubDisplayRatio, 0, 1) * endTime;
